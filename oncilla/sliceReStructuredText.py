@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-**sliceDocumentation.py
+**sliceReStructuredText.py
 
 **Platform:**
 	Windows, Linux, Mac Os X.
 
 **Description:**
-	Slices given documentation file.
+	Slices given reStructuredText file.
 
 **Others:**
 
@@ -26,7 +26,7 @@ import sys
 
 def _setEncoding():
 	"""
-	This definition sets the Application encoding.
+	Sets the Application encoding.
 	"""
 
 	reload(sys)
@@ -37,8 +37,10 @@ _setEncoding()
 #**********************************************************************************************************************
 #***	External imports.
 #**********************************************************************************************************************
+import argparse
 import os
 import re
+
 if sys.version_info[:2] <= (2, 6):
 	from ordereddict import OrderedDict
 else:
@@ -47,6 +49,7 @@ else:
 #**********************************************************************************************************************
 #***	Internal imports.
 #**********************************************************************************************************************
+import foundations.decorators
 import foundations.verbose
 from foundations.io import File
 
@@ -61,11 +64,13 @@ __email__ = "thomas.mansencal@gmail.com"
 __status__ = "Production"
 
 __all__ = ["LOGGER",
-		"OUTPUT_FILES_EXTENSION",
-		"SLICE_ATTRIBUTE_INDENT",
-		"CONTENT_DELETION",
-		"CONTENT_SUBSTITUTIONS",
-		"sliceDocumentation"]
+		   "OUTPUT_FILES_EXTENSION",
+		   "SLICE_ATTRIBUTE_INDENT",
+		   "CONTENT_DELETION",
+		   "CONTENT_SUBSTITUTIONS",
+		   "sliceReStructuredText",
+		   "getCommandLineArguments",
+		   "main"]
 
 LOGGER = foundations.verbose.installLogger()
 
@@ -73,7 +78,7 @@ OUTPUT_FILES_EXTENSION = "rst"
 SLICE_ATTRIBUTE_INDENT = 2
 CONTENT_DELETION = ()
 CONTENT_SUBSTITUTIONS = {"resources/": "../",
-						"     \|":"            |" }
+						 "     \|": "            |"}
 
 foundations.verbose.getLoggingConsoleHandler()
 foundations.verbose.setVerbosityLevel(3)
@@ -81,18 +86,18 @@ foundations.verbose.setVerbosityLevel(3)
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def sliceDocumentation(fileIn, outputDirectory):
+def sliceReStructuredText(input, output):
 	"""
-	This Definition slices given documentation file.
+	Slices given reStructuredText file.
 
-	:param fileIn: File to convert.
-	:type fileIn: unicode
-	:param outputDirectory: Output directory.
-	:type outputDirectory: unicode
+	:param input: ReStructuredText file to slice.
+	:type input: unicode
+	:param output: Directory to output sliced reStructuredText files.
+	:type output: unicode
 	"""
 
-	LOGGER.info("{0} | Slicing '{1}' file!".format(sliceDocumentation.__name__, fileIn))
-	file = File(fileIn)
+	LOGGER.info("{0} | Slicing '{1}' file!".format(sliceReStructuredText.__name__, input))
+	file = File(input)
 	file.cache()
 
 	slices = OrderedDict()
@@ -103,18 +108,18 @@ def sliceDocumentation(fileIn, outputDirectory):
 
 	index = 0
 	for slice, sliceStart in slices.iteritems():
-		sliceFile = File(os.path.join(outputDirectory, "{0}.{1}".format(slice, OUTPUT_FILES_EXTENSION)))
-		LOGGER.info("{0} | Outputing '{1}' file!".format(sliceDocumentation.__name__, sliceFile.path))
+		sliceFile = File(os.path.join(output, "{0}.{1}".format(slice, OUTPUT_FILES_EXTENSION)))
+		LOGGER.info("{0} | Outputing '{1}' file!".format(sliceReStructuredText.__name__, sliceFile.path))
 		sliceEnd = index < (len(slices.values()) - 1) and slices.values()[index + 1] - SLICE_ATTRIBUTE_INDENT or \
-		len(file.content)
+				   len(file.content)
 
 		for i in range(sliceStart, sliceEnd):
 			skipLine = False
 			for item in CONTENT_DELETION:
 				if re.search(item, file.content[i]):
-					LOGGER.info("{0} | Skipping Line '{1}' with '{2}' content!".format(sliceDocumentation.__name__,
-																						i,
-																						item))
+					LOGGER.info("{0} | Skipping Line '{1}' with '{2}' content!".format(sliceReStructuredText.__name__,
+																					   i,
+																					   item))
 					skipLine = True
 					break
 
@@ -127,7 +132,7 @@ def sliceDocumentation(fileIn, outputDirectory):
 
 			search = re.search(r"-  `[\w ]+`_ \(([\w\.]+)\)", line)
 			if search:
-				LOGGER.info("{0} | Updating Line '{1}' link: '{2}'!".format(sliceDocumentation.__name__,
+				LOGGER.info("{0} | Updating Line '{1}' link: '{2}'!".format(sliceReStructuredText.__name__,
 																			i,
 																			search.groups()[0]))
 				line = "-  :ref:`{0}`\n".format(search.groups()[0])
@@ -136,6 +141,51 @@ def sliceDocumentation(fileIn, outputDirectory):
 		sliceFile.write()
 		index += 1
 
+def getCommandLineArguments():
+	"""
+	Retrieves command line arguments.
+
+	:return: Namespace.
+	:rtype: Namespace
+	"""
+
+	parser = argparse.ArgumentParser(add_help=False)
+
+	parser.add_argument("-h",
+						"--help",
+						action="help",
+						help="'Displays this help message and exit.'")
+
+	parser.add_argument("-i",
+						"--input",
+						type=unicode,
+						dest="input",
+						help="'ReStructuredText file to slice.'")
+
+	parser.add_argument("-o",
+						"--output",
+						type=unicode,
+						dest="output",
+						help="'Directory to output sliced reStructuredText files.'")
+
+	if len(sys.argv) == 1:
+		parser.print_help()
+		sys.exit(1)
+
+	return parser.parse_args()
+
+@foundations.decorators.systemExit
+def main():
+	"""
+	Starts the Application.
+
+	:return: Definition success.
+	:rtype: bool
+	"""
+
+	args = getCommandLineArguments()
+	return sliceReStructuredText(args.input,
+							  args.output)
+
 if __name__ == "__main__":
-	arguments = map(unicode, sys.argv)
-	sliceDocumentation(arguments[1], arguments[2])
+	main()

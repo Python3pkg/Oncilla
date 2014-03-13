@@ -1,37 +1,37 @@
 #!/usr/bin/env bash
 
-export PROJECT_DIRECTORY=$(cd $( dirname "${BASH_SOURCE[0]}" )/../../..; pwd)
-export PROJECT=$( basename $PROJECT_DIRECTORY )
+: ${ONCILLA_PROJECT_DIRECTORY:?"ONCILLA_PROJECT_DIRECTORY must be set to the project directory you want to build the manual and Sphinx documentation!"}
+: ${ONCILLA_PROJECT_NAME:?"ONCILLA_PROJECT_NAME must be set to the name you want to use across the manual and Sphinx documentation files!"}
+: ${ONCILLA_PROJECT_PACKAGES:?"ONCILLA_PROJECT_PACKAGES must be set to the packages you want to build the Sphinx documentation!"}
 
 echo -------------------------------------------------------------------------------
-echo $PROJECT - Documentation Build
+echo $ONCILLA_PROJECT_NAME - Documentation Build
 echo -------------------------------------------------------------------------------
+export ONCILLA_DIRECTORY=$(cd $( dirname "${BASH_SOURCE[0]}" )/../oncilla; pwd)
+export HELP_DIRECTORY=$ONCILLA_PROJECT_DIRECTORY/docs/help
+export SPHINX_DIRECTORY=$ONCILLA_PROJECT_DIRECTORY/docs/sphinx
 
-export ONCILLA_DIRECTORY=$PROJECT_DIRECTORY/utilities/Oncilla/oncilla
-export HELP_DIRECTORY=$PROJECT_DIRECTORY/docs/help
-export SPHINX_DIRECTORY=$PROJECT_DIRECTORY/docs/sphinx
-
-#! Inline documentation build.
+# Inline documentation build.
 echo -------------------------------------------------------------------------------
 echo Inline Documentation Build - Begin
 echo -------------------------------------------------------------------------------
-python $ONCILLA_DIRECTORY/reStructuredTextToHtml.py "$HELP_DIRECTORY/${PROJECT}_Manual.rst" "$HELP_DIRECTORY/${PROJECT}_Manual.html"
+python $ONCILLA_DIRECTORY/reStructuredTextToHtml.py --input "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.rst" --output "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.html"
 echo -------------------------------------------------------------------------------
-echo ${PROJECT} - Inline Documentation Build - End
+echo Inline Documentation Build - End
 echo -------------------------------------------------------------------------------
 
-#! Sphinx documentation build.
+# Sphinx documentation build.
 echo -------------------------------------------------------------------------------
 echo Sphinx Documentation Build - Begin
 echo -------------------------------------------------------------------------------
-python $ONCILLA_DIRECTORY/sliceDocumentation.py "$HELP_DIRECTORY/${PROJECT}_Manual.rst" "$SPHINX_DIRECTORY/source/resources/pages"
-python $ONCILLA_DIRECTORY/sliceDocumentation.py "$PROJECT_DIRECTORY/CHANGES.rst" "$SPHINX_DIRECTORY/source/resources/pages"
-python $ONCILLA_DIRECTORY/buildSphinxDocumentationTocTree.py "$PROJECT" "$SPHINX_DIRECTORY/source/resources/pages/tocTree.rst" "$SPHINX_DIRECTORY/source/index.rst" "$SPHINX_DIRECTORY/source/resources/pages"
+python $ONCILLA_DIRECTORY/sliceReStructuredText.py --input "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.rst" --output "$SPHINX_DIRECTORY/source/resources/pages"
+python $ONCILLA_DIRECTORY/sliceReStructuredText.py --input "$ONCILLA_PROJECT_DIRECTORY/CHANGES.rst" --output "$SPHINX_DIRECTORY/source/resources/pages"
+python $ONCILLA_DIRECTORY/buildDocumentationTocTree.py --title "$ONCILLA_PROJECT_NAME" --input "$SPHINX_DIRECTORY/source/resources/pages/tocTree.rst" --output "$SPHINX_DIRECTORY/source/index.rst" --contentDirectory "$SPHINX_DIRECTORY/source/resources/pages"
 rm -rf $SPHINX_DIRECTORY/build
 rm -rf $SPHINX_DIRECTORY/source/resources/packages
 rm $SPHINX_DIRECTORY/source/resources/pages/api/*
 rm "$SPHINX_DIRECTORY/source/resources/pages/tocTree.rst"
-python $ONCILLA_DIRECTORY/buildSphinxDocumentationApi.py $( echo "${PROJECT}" | tr "[:upper:]" "[:lower:]" ) "$SPHINX_DIRECTORY/source/resources/packages" "$SPHINX_DIRECTORY/source/resources/pages/api" "$SPHINX_DIRECTORY/source/resources/pages/api.rst"
+python $ONCILLA_DIRECTORY/buildDocumentationApi.py --packages "${ONCILLA_PROJECT_PACKAGES}" --input "$SPHINX_DIRECTORY/source/resources/packages" --output "$SPHINX_DIRECTORY/source/resources/pages/api" --excludedModules "${ONCILLA_PROJECT_EXCLUDED_MODULES}"
 export PYTHONPATH=$SPHINX_DIRECTORY/source/resources/packages
 sphinx-build -b html -d $SPHINX_DIRECTORY/build/doctrees $SPHINX_DIRECTORY/source $SPHINX_DIRECTORY/build/html
 echo -------------------------------------------------------------------------------
