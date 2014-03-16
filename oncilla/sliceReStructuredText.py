@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**sliceReStructuredText.py
+**sliceReStructuredText.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -67,7 +67,7 @@ __all__ = ["LOGGER",
 		   "OUTPUT_FILES_EXTENSION",
 		   "SLICE_ATTRIBUTE_INDENT",
 		   "CONTENT_DELETION",
-		   "CONTENT_SUBSTITUTIONS",
+		   "STATEMENT_SUBSTITUTE",
 		   "sliceReStructuredText",
 		   "getCommandLineArguments",
 		   "main"]
@@ -77,7 +77,7 @@ LOGGER = foundations.verbose.installLogger()
 OUTPUT_FILES_EXTENSION = "rst"
 SLICE_ATTRIBUTE_INDENT = 2
 CONTENT_DELETION = ()
-CONTENT_SUBSTITUTIONS = {"resources/": "../",
+STATEMENT_SUBSTITUTE = {"resources/": "../",
 						 "     \|": "            |"}
 
 foundations.verbose.getLoggingConsoleHandler()
@@ -94,6 +94,8 @@ def sliceReStructuredText(input, output):
 	:type input: unicode
 	:param output: Directory to output sliced reStructuredText files.
 	:type output: unicode
+	:return: Definition success.
+	:rtype: bool
 	"""
 
 	LOGGER.info("{0} | Slicing '{1}' file!".format(sliceReStructuredText.__name__, input))
@@ -127,7 +129,7 @@ def sliceReStructuredText(input, output):
 				continue
 
 			line = file.content[i]
-			for pattern, value in CONTENT_SUBSTITUTIONS.iteritems():
+			for pattern, value in STATEMENT_SUBSTITUTE.iteritems():
 				line = re.sub(pattern, value, line)
 
 			search = re.search(r"-  `[\w ]+`_ \(([\w\.]+)\)", line)
@@ -140,6 +142,8 @@ def sliceReStructuredText(input, output):
 
 		sliceFile.write()
 		index += 1
+
+	return True
 
 def getCommandLineArguments():
 	"""
@@ -185,7 +189,7 @@ def main():
 
 	args = getCommandLineArguments()
 	return sliceReStructuredText(args.input,
-							  args.output)
+								 args.output)
 
 if __name__ == "__main__":
 	main()

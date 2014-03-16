@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**buildDocumentationTocTree.py
+**buildTocTree.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -69,7 +69,7 @@ __all__ = ["LOGGER",
 		   "FILES_EXTENSION",
 		   "TOCTREE_TEMPLATE_BEGIN",
 		   "TOCTREE_TEMPLATE_END",
-		   "buildDocumentationTocTree",
+		   "buildTocTree",
 		   "getCommandLineArguments",
 		   "main"]
 
@@ -98,7 +98,7 @@ foundations.verbose.setVerbosityLevel(3)
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def buildDocumentationTocTree(title, input, output, contentDirectory):
+def buildTocTree(title, input, output, contentDirectory):
 	"""
 	Builds Sphinx documentation table of content tree file.
 
@@ -110,9 +110,11 @@ def buildDocumentationTocTree(title, input, output, contentDirectory):
 	:type output: unicode
 	:param contentDirectory: Directory containing the content to be included in the table of content.
 	:type contentDirectory: unicode
+	:return: Definition success.
+	:rtype: bool
 	"""
 
-	LOGGER.info("{0} | Building Sphinx documentation index '{1}' file!".format(buildDocumentationTocTree.__name__,
+	LOGGER.info("{0} | Building Sphinx documentation index '{1}' file!".format(buildTocTree.__name__,
 																			   output))
 	file = File(input)
 	file.cache()
@@ -132,7 +134,7 @@ def buildDocumentationTocTree(title, input, output, contentDirectory):
 		if code in existingFiles:
 			link = "{0}/{1}".format(relativeDirectory, code)
 			data = "{0}{1}{2} <{3}>\n".format(" ", " " * line.index("-"), item, link)
-			LOGGER.info("{0} | Adding '{1}' entry to Toc Tree!".format(buildDocumentationTocTree.__name__,
+			LOGGER.info("{0} | Adding '{1}' entry to Toc Tree!".format(buildTocTree.__name__,
 																	   data.replace("\n", "")))
 			tocTree.append(data)
 	tocTree.append("\n")
@@ -146,6 +148,8 @@ def buildDocumentationTocTree(title, input, output, contentDirectory):
 	file = File(output)
 	file.content = content
 	file.write()
+
+	return True
 
 def getCommandLineArguments():
 	"""
@@ -202,10 +206,10 @@ def main():
 	"""
 
 	args = getCommandLineArguments()
-	return buildDocumentationTocTree(args.title,
-									 args.input,
-									 args.output,
-									 args.contentDirectory)
+	return buildTocTree(args.title,
+						args.input,
+						args.output,
+						args.contentDirectory)
 
 if __name__ == "__main__":
 	main()

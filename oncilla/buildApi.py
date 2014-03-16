@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**buildDocumentationApi.py
+**buildApi.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -39,7 +39,6 @@ _setEncoding()
 #**********************************************************************************************************************
 import argparse
 import os
-import re
 import shutil
 
 if sys.version_info[:2] <= (2, 6):
@@ -52,6 +51,7 @@ else:
 #**********************************************************************************************************************
 import foundations.common
 import foundations.decorators
+import foundations.exceptions
 import foundations.strings
 import foundations.verbose
 import foundations.walkers
@@ -74,10 +74,9 @@ __all__ = ["LOGGER",
 		   "FILES_EXTENSION",
 		   "TOCTREE_TEMPLATE_BEGIN",
 		   "TOCTREE_TEMPLATE_END",
-		   "STATEMENTS_UPDATE_MESSAGE",
-		   "DECORATORS_COMMENT_MESSAGE",
-		   "CONTENT_SUBSTITUTIONS",
-		   "buildDocumentationApi",
+		   "SANITIZER",
+		   "importSanitizer",
+		   "buildApi",
 		   "getCommandLineArguments",
 		   "main"]
 
@@ -96,14 +95,7 @@ TOCTREE_TEMPLATE_BEGIN = ["Api\n",
 
 TOCTREE_TEMPLATE_END = []
 
-STATEMENTS_UPDATE_MESSAGE = "#**********************************************************************************************************************\n" \
-							"#***\tSphinx: Statements updated for auto-documentation purpose.\n" \
-							"#**********************************************************************************************************************"
-
-DECORATORS_COMMENT_MESSAGE = "#***\tSphinx: Decorator commented for auto-documentation purpose."
-
-CONTENT_SUBSTITUTIONS = {"Initializes the class.\n":
-							 ".. Sphinx: Statements updated for auto-documentation purpose.\n"}
+SANITIZER = os.path.join(os.path.dirname(__file__), "defaultSanitizer.py")
 
 foundations.verbose.getLoggingConsoleHandler()
 foundations.verbose.setVerbosityLevel(3)
@@ -111,7 +103,27 @@ foundations.verbose.setVerbosityLevel(3)
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def buildDocumentationApi(packages, input, output, excludedModules=None):
+def importSanitizer(sanitizer):
+	"""
+	Imports the sanitizer python module.
+
+	:param sanitizer: Sanitizer python module file.
+	:type sanitizer: unicode
+	:return: Module.
+	:rtype: object
+	"""
+
+	directory = os.path.dirname(sanitizer)
+	not directory in sys.path and sys.path.append(directory)
+
+	namespace = __import__(foundations.strings.getSplitextBasename(sanitizer))
+	if hasattr(namespace, "bleach"):
+		return namespace
+	else:
+		raise foundations.exceptions.ProgrammingError(
+		"{0} | '{1}' is not a valid sanitizer module file!".format(sanitizer))
+
+def buildApi(packages, input, output, sanitizer, excludedModules=None):
 	"""
 	Builds the Sphinx documentation API.
 
@@ -121,11 +133,17 @@ def buildDocumentationApi(packages, input, output, excludedModules=None):
 	:type input: unicode
 	:param output: Output reStructuredText files directory.
 	:type output: unicode
+	:param sanitizer: Sanitizer python module.
+	:type sanitizer: unicode
 	:param excludedModules: Excluded modules.
 	:type excludedModules: list
+	:return: Definition success.
+	:rtype: bool
 	"""
 
-	LOGGER.info("{0} | Building Sphinx documentation API!".format(buildDocumentationApi.__name__))
+	LOGGER.info("{0} | Building Sphinx documentation API!".format(buildApi.__name__))
+
+	sanitizer = importSanitizer(sanitizer)
 
 	if os.path.exists(input):
 		shutil.rmtree(input)
@@ -142,7 +160,7 @@ def buildDocumentationApi(packages, input, output, excludedModules=None):
 
 		for file in sorted(
 				list(foundations.walkers.filesWalker(packageDirectory, filtersIn=("{0}.*\.ui$".format(path),)))):
-			LOGGER.info("{0} | Ui file: '{1}'".format(buildDocumentationApi.__name__, file))
+			LOGGER.info("{0} | Ui file: '{1}'".format(buildApi.__name__, file))
 			targetDirectory = os.path.dirname(file).replace(packageDirectory, "")
 			directory = "{0}{1}".format(input, targetDirectory)
 			if not foundations.common.pathExists(directory):
@@ -154,63 +172,23 @@ def buildDocumentationApi(packages, input, output, excludedModules=None):
 		for file in sorted(
 				list(foundations.walkers.filesWalker(packageDirectory, filtersIn=("{0}.*\.py$".format(path),),
 													 filtersOut=excludedModules))):
-			LOGGER.info("{0} | Python file: '{1}'".format(buildDocumentationApi.__name__, file))
+			LOGGER.info("{0} | Python file: '{1}'".format(buildApi.__name__, file))
 			module = "{0}.{1}".format((".".join(os.path.dirname(file).replace(packageDirectory, "").split("/"))),
 									  foundations.strings.getSplitextBasename(file)).strip(".")
-			LOGGER.info("{0} | Module name: '{1}'".format(buildDocumentationApi.__name__, module))
+			LOGGER.info("{0} | Module name: '{1}'".format(buildApi.__name__, module))
 			directory = os.path.dirname(os.path.join(input, module.replace(".", "/")))
 			if not foundations.common.pathExists(directory):
 				os.makedirs(directory)
 			source = os.path.join(directory, os.path.basename(file))
 			shutil.copyfile(file, source)
 
-			sourceFile = File(source)
-			sourceFile.cache()
-			trimFromIndex = trimEndIndex = None
-			inMultilineString = inDecorator = False
-			for i, line in enumerate(sourceFile.content):
-				if re.search(r"__name__ +\=\= +\"__main__\"", line):
-					trimFromIndex = i
-				for pattern, value in CONTENT_SUBSTITUTIONS.iteritems():
-					if re.search(pattern, line):
-						sourceFile.content[i] = re.sub(pattern, value, line)
-
-				strippedLine = line.strip()
-				if re.search(r"^\"\"\"", strippedLine):
-					inMultilineString = not inMultilineString
-
-				if inMultilineString:
-					continue
-
-				if re.search(r"^@\w+", strippedLine) and \
-						not re.search(r"@property", strippedLine) and \
-						not re.search(r"^@\w+\.setter", strippedLine) and \
-						not re.search(r"^@\w+\.deleter", strippedLine):
-					inDecorator = True
-
-				indent = re.search(r"^(\s*)", line)
-
-				if re.search(r"^\s*def\s+\w+", sourceFile.content[i]) or \
-						re.search(r"^\s*class\s+\w+", sourceFile.content[i]):
-					inDecorator = False
-
-				if not inDecorator:
-					continue
-
-				sourceFile.content[i] = "{0}{1} {2}".format(indent.groups()[0], DECORATORS_COMMENT_MESSAGE, line)
-
-			if trimFromIndex:
-				LOGGER.info("{0} | Trimming '__main__' statements!".format(buildDocumentationApi.__name__))
-				content = [sourceFile.content[i] for i in range(trimFromIndex)]
-				content.append("{0}\n".format(STATEMENTS_UPDATE_MESSAGE))
-				sourceFile.content = content
-			sourceFile.write()
+			sanitizer.bleach(source)
 
 			if "__init__.py" in file:
 				continue
 
 			rstFilePath = "{0}{1}".format(module, FILES_EXTENSION)
-			LOGGER.info("{0} | Building API file: '{1}'".format(buildDocumentationApi.__name__, rstFilePath))
+			LOGGER.info("{0} | Building API file: '{1}'".format(buildApi.__name__, rstFilePath))
 			rstFile = File(os.path.join(output, rstFilePath))
 			header = ["_`{0}`\n".format(module),
 					  "==={0}\n".format("=" * len(module)),
@@ -264,6 +242,8 @@ def buildDocumentationApi(packages, input, output, excludedModules=None):
 	apiFile.content.extend(TOCTREE_TEMPLATE_END)
 	apiFile.write()
 
+	return True
+
 def getCommandLineArguments():
 	"""
 	Retrieves command line arguments.
@@ -297,6 +277,12 @@ def getCommandLineArguments():
 						dest="output",
 						help="'Output reStructuredText files directory.'")
 
+	parser.add_argument("-s",
+						"--sanitizer",
+						type=unicode,
+						dest="sanitizer",
+						help="'Sanitizer python module'")
+
 	parser.add_argument("-x",
 						"--excludedModules",
 						dest="excludedModules",
@@ -319,10 +305,13 @@ def main():
 	"""
 
 	args = getCommandLineArguments()
-	return buildDocumentationApi(args.packages,
-									   args.input,
-									   args.output,
-									   args.excludedModules)
+	args.sanitizer = args.sanitizer if foundations.common.pathExists(args.sanitizer) else SANITIZER
+	args.excludedModules = args.excludedModules if all(args.excludedModules) else []
+	return buildApi(args.packages,
+					args.input,
+					args.output,
+					args.sanitizer,
+					args.excludedModules)
 
 if __name__ == "__main__":
 	main()

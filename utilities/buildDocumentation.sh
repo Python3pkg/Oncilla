@@ -26,12 +26,12 @@ echo Sphinx Documentation Build - Begin
 echo -------------------------------------------------------------------------------
 python $ONCILLA_DIRECTORY/sliceReStructuredText.py --input "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.rst" --output "$SPHINX_DIRECTORY/source/resources/pages"
 python $ONCILLA_DIRECTORY/sliceReStructuredText.py --input "$ONCILLA_PROJECT_DIRECTORY/CHANGES.rst" --output "$SPHINX_DIRECTORY/source/resources/pages"
-python $ONCILLA_DIRECTORY/buildDocumentationTocTree.py --title "$ONCILLA_PROJECT_NAME" --input "$SPHINX_DIRECTORY/source/resources/pages/tocTree.rst" --output "$SPHINX_DIRECTORY/source/index.rst" --contentDirectory "$SPHINX_DIRECTORY/source/resources/pages"
+python $ONCILLA_DIRECTORY/buildTocTree.py --title "$ONCILLA_PROJECT_NAME" --input "$SPHINX_DIRECTORY/source/resources/pages/tocTree.rst" --output "$SPHINX_DIRECTORY/source/index.rst" --contentDirectory "$SPHINX_DIRECTORY/source/resources/pages"
 rm -rf $SPHINX_DIRECTORY/build
 rm -rf $SPHINX_DIRECTORY/source/resources/packages
 rm $SPHINX_DIRECTORY/source/resources/pages/api/*
 rm "$SPHINX_DIRECTORY/source/resources/pages/tocTree.rst"
-python $ONCILLA_DIRECTORY/buildDocumentationApi.py --packages "${ONCILLA_PROJECT_PACKAGES}" --input "$SPHINX_DIRECTORY/source/resources/packages" --output "$SPHINX_DIRECTORY/source/resources/pages/api" --excludedModules "${ONCILLA_PROJECT_EXCLUDED_MODULES}"
+python $ONCILLA_DIRECTORY/buildApi.py --packages $ONCILLA_PROJECT_PACKAGES --input "$SPHINX_DIRECTORY/source/resources/packages" --output "$SPHINX_DIRECTORY/source/resources/pages/api"  --sanitizer "${ONCILLA_PROJECT_SANITIZER}" --excludedModules $ONCILLA_PROJECT_EXCLUDED_MODULES
 export PYTHONPATH=$SPHINX_DIRECTORY/source/resources/packages
 sphinx-build -b html -d $SPHINX_DIRECTORY/build/doctrees $SPHINX_DIRECTORY/source $SPHINX_DIRECTORY/build/html
 echo -------------------------------------------------------------------------------

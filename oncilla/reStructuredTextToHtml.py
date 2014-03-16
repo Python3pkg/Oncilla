@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**reStructuredTextToHtml.py
+**reStructuredTextToHtml.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -89,6 +89,8 @@ def reStructuredTextToHtml(input, output):
 	:type input: unicode
 	:param output: Output html file.
 	:type output: unicode
+	:return: Definition success.
+	:rtype: bool
 	"""
 
 	LOGGER.info("{0} | Converting '{1}' reStructuredText file to html!".format(reStructuredTextToHtml.__name__, input))
@@ -105,6 +107,8 @@ def reStructuredTextToHtml(input, output):
 	LOGGER.info("{0} | Replacing spaces with tabs!".format(reStructuredTextToHtml.__name__))
 	file.content = [line.replace(" " * 4, "\t") for line in file.content]
 	file.write()
+
+	return True
 
 def getCommandLineArguments():
 	"""
