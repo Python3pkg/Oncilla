@@ -14,7 +14,7 @@ Module Attributes
 
 .. attribute:: oncilla.sliceReStructuredText.CONTENT_DELETION
 
-.. attribute:: oncilla.sliceReStructuredText.CONTENT_SUBSTITUTIONS
+.. attribute:: oncilla.sliceReStructuredText.STATEMENT_SUBSTITUTE
 
 Functions
 ---------

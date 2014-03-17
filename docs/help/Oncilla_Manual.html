@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="generator" content="Docutils 0.9.1: http://docutils.sourceforge.net/" />
+		<meta name="generator" content="Docutils 0.11: http://docutils.sourceforge.net/" />
 		<title></title>
 		<style type="text/css">
 /*<![CDATA[*/
@@ -162,7 +162,43 @@ python setup.py install
 			<div class="section" id="id3">
 				<h1>
 					<span class="target" id="usage">Usage</span>
-				</h1><br />
+				</h1>
+				<p>
+					Once installed, you can launch <strong>Oncilla</strong> using this shell command:
+				</p>
+				<pre class="literal-block">
+Oncilla
+</pre>
+				<p>
+					You will need to have the following environment variables defined:
+				</p>
+				<ul class="simple">
+					<li>
+						<strong>ONCILLA_PROJECT_DIRECTORY</strong>: Defines the project directory you want to build the manual and <strong>Sphinx</strong> documentation.
+					</li>
+					<li>
+						<strong>ONCILLA_PROJECT_NAME</strong>: Defines the name you want to use across the manual and <strong>Sphinx</strong> documentation files.
+					</li>
+					<li>
+						<strong>ONCILLA_PROJECT_PACKAGES</strong>: Defines the packages you want to build the <strong>Sphinx</strong> documentation.
+					</li>
+					<li>
+						<strong>ONCILLA_PROJECT_SANITIZER</strong>: Defines the optional <strong>Sphinx</strong> documentation sanitizing <strong>Python</strong> module.
+					</li>
+					<li>
+						<strong>ONCILLA_PROJECT_EXCLUDED_MODULES</strong>: Defines the optional excluded <strong>Python</strong> modules from <strong>Sphinx</strong> documentation.
+					</li>
+				</ul>
+				<p>
+					Example:
+				</p>
+				<pre class="literal-block">
+export ONCILLA_PROJECT_DIRECTORY=&quot;/Users/kelsolaar/Documents/Development/sIBL_GUI&quot;
+export ONCILLA_PROJECT_NAME=&quot;sIBL_GUI&quot;
+export ONCILLA_PROJECT_PACKAGES=&quot;oncilla foundations manager umbra sibl_gui&quot;
+export ONCILLA_PROJECT_SANITIZER=&quot;/Users/kelsolaar/Documents/Development/sIBL_GUI/utilities/sanitizer.py&quot;
+export ONCILLA_PROJECT_EXCLUDED_MODULES=&quot;pyclbr tests 001_dummy 001_migrate_3-x-x_to_4-0-0 002_migrate_4-x-x_to_4-0-2 003_migrate_4-x-x_to_4-0-3 004_migrate_4-x-x_to_4-0-7 defaultScript&quot;
+</pre><br />
 				<!-- .api -->
 			</div>
 			<div class="section" id="id4">

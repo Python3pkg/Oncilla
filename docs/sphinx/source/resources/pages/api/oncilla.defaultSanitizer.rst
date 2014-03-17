@@ -8,9 +8,9 @@ Module Attributes
 
 .. attribute:: oncilla.defaultSanitizer.LOGGER
 
-.. attribute:: oncilla.defaultSanitizer.STATEMENTS_UPDATE_MESSAGE
+.. attribute:: oncilla.defaultSanitizer.STATEMENT_UPDATE_MESSAGE
 
-.. attribute:: oncilla.defaultSanitizer.CONTENT_SUBSTITUTIONS
+.. attribute:: oncilla.defaultSanitizer.STATEMENT_SUBSTITUTE
 
 Functions
 ---------
