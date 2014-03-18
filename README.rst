@@ -1,6 +1,9 @@
 Oncilla
 =======
 
+..  image:: https://secure.travis-ci.org/KelSolaar/Oncilla.png?branch=master
+..  image:: https://gemnasium.com/KelSolaar/Oncilla.png
+
 Introduction
 ------------
 
