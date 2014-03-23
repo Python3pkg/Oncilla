@@ -11,13 +11,13 @@ export ONCILLA_DIRECTORY=$(cd $( dirname "${BASH_SOURCE[0]}" )/../oncilla; pwd)
 export HELP_DIRECTORY=$ONCILLA_PROJECT_DIRECTORY/docs/help
 export SPHINX_DIRECTORY=$ONCILLA_PROJECT_DIRECTORY/docs/sphinx
 
-# Inline documentation build.
+# Manual build.
 echo -------------------------------------------------------------------------------
-echo Inline Documentation Build - Begin
+echo Manual Build - Begin
 echo -------------------------------------------------------------------------------
-python $ONCILLA_DIRECTORY/reStructuredTextToHtml.py --input "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.rst" --output "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.html"
+python $ONCILLA_DIRECTORY/reStructuredTextToHtml.py --input "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.rst" --output "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.html" --cssFile "${ONCILLA_PROJECT_MANUAL_CSS_FILE}"
 echo -------------------------------------------------------------------------------
-echo Inline Documentation Build - End
+echo Manual Build - End
 echo -------------------------------------------------------------------------------
 
 # Sphinx documentation build.

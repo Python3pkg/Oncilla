@@ -81,7 +81,7 @@ foundations.verbose.setVerbosityLevel(3)
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def reStructuredTextToHtml(input, output):
+def reStructuredTextToHtml(input, output, cssFile):
 	"""
 	Outputs a reStructuredText file to html.
 
@@ -89,13 +89,15 @@ def reStructuredTextToHtml(input, output):
 	:type input: unicode
 	:param output: Output html file.
 	:type output: unicode
+	:param cssFile: Css file.
+	:type cssFile: unicode
 	:return: Definition success.
 	:rtype: bool
 	"""
 
 	LOGGER.info("{0} | Converting '{1}' reStructuredText file to html!".format(reStructuredTextToHtml.__name__, input))
 	os.system("{0} --stylesheet-path='{1}' '{2}' > '{3}'".format(RST2HTML,
-																 os.path.join(os.path.dirname(__file__), CSS_FILE),
+																 os.path.join(os.path.dirname(__file__), cssFile),
 																 input,
 																 output))
 
@@ -137,6 +139,12 @@ def getCommandLineArguments():
 						dest="output",
 						help="'Output html file.'")
 
+	parser.add_argument("-c",
+						"--cssFile",
+						type=unicode,
+						dest="cssFile",
+						help="'Css file.'")
+
 	if len(sys.argv) == 1:
 		parser.print_help()
 		sys.exit(1)
@@ -153,8 +161,10 @@ def main():
 	"""
 
 	args = getCommandLineArguments()
+	args.cssFile = args.cssFile if foundations.common.pathExists(args.cssFile) else CSS_FILE
 	return reStructuredTextToHtml(args.input,
-								  args.output)
+								  args.output,
+								  args.cssFile)
 
 if __name__ == "__main__":
 	main()
