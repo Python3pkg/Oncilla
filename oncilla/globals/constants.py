@@ -51,28 +51,64 @@ class Constants():
 	"""
 
 	applicationName = "Oncilla"
-	"""Package Application name: '**Oncilla**' ( String )"""
+	"""
+	:param applicationName: Package Application name.
+	:type applicationName: unicode
+	"""
 	majorVersion = "0"
-	"""Package major version: '**0**' ( String )"""
+	"""
+	:param majorVersion: Package major version.
+	:type majorVersion: unicode
+	"""
 	minorVersion = "1"
-	"""Package minor version: '**1**' ( String )"""
+	"""
+	:param minorVersion: Package minor version.
+	:type minorVersion: unicode
+	"""
 	changeVersion = "0"
-	"""Package change version: '**0**' ( String )"""
+	"""
+	:param changeVersion: Package change version.
+	:type changeVersion: unicode
+	"""
 	releaseVersion = ".".join((majorVersion, minorVersion, changeVersion))
-	"""Package release version: '**0.1.0**' ( String )"""
+	"""
+	:param releaseVersion: Package release version.
+	:type releaseVersion: unicode
+	"""
 
 	logger = "Oncilla_Logger"
-	"""Package logger name: '**Oncilla_Logger**' ( String )"""
+	"""
+	:param logger: Package logger name.
+	:type logger: unicode
+	"""
 	verbosityLevel = 3
-	"""Default logging verbosity level: '**3**' ( Integer )"""
+	"""
+	:param verbosityLevel: Default logging verbosity level.
+	:type verbosityLevel: int
+	"""
 	verbosityLabels = ("Critical", "Error", "Warning", "Info", "Debug")
-	"""Logging verbosity labels: ('**Critical**', '**Error**', '**Warning**', '**Info**', '**Debug**') ( Tuple )"""
+	"""
+	:param verbosityLabels: Logging verbosity labels.
+	:type verbosityLabels: tuple
+	"""
 	loggingDefaultFormatter = "Default"
-	"""Default logging formatter name: '**Default**' ( String )"""
+	"""
+	:param loggingDefaultFormatter: Default logging formatter name.
+	:type loggingDefaultFormatter: unicode
+	"""
 	loggingSeparators = "*" * 96
-	"""Logging separators: '*' * 96 ( String )"""
+	"""
+	:param loggingSeparators: Logging separators.
+	:type loggingSeparators: unicode
+	"""
 
 	defaultCodec = oncilla.DEFAULT_CODEC
-	"""Default codec: '**utf-8**' ( String )"""
+	"""
+	:param defaultCodec: Default codec.
+	:type defaultCodec: unicode
+	"""
 	codecError = "ignore"
-	"""Default codec error behavior: '**ignore**' ( String )"""
+	"""
+	:param codecError: Default codec error behavior.
+	:type codecError: unicode
+	"""
