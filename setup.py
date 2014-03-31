@@ -83,7 +83,7 @@ def getLongDescription():
 	return "".join(description)
 
 setup(name=oncilla.globals.constants.Constants.applicationName,
-	  version=oncilla.globals.constants.Constants.releaseVersion,
+	  version=oncilla.globals.constants.Constants.version,
 	  author=oncilla.globals.constants.__author__,
 	  author_email=oncilla.globals.constants.__email__,
 	  include_package_data=True,

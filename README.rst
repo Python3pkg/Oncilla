@@ -46,7 +46,7 @@ You will need to have the following environment variables defined:
 -  **ONCILLA_PROJECT_PACKAGES**: Defines the packages you want to build the **Sphinx** documentation.
 -  **ONCILLA_PROJECT_SANITIZER**: Defines the optional **Sphinx** documentation sanitizing **Python** module.
 -  **ONCILLA_PROJECT_EXCLUDED_MODULES**: Defines the optional excluded **Python** modules from **Sphinx** documentation.
--  **ONCILLA_PROJECT_MANUAL_CSS_FILE**: Defines the optional excluded **css** stylesheet file used for the manual.
+-  **ONCILLA_PROJECT_MANUAL_CSS_FILE**: Defines the optional **css** stylesheet file used for the manual.
 
 Example:
 

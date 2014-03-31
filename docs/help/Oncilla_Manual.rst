@@ -26,7 +26,7 @@ Table Of Content
 _`Introduction`
 ===============
 
-**Oncilla** is the core package of `Umbra <http://github.com/KelSolaar/Umbra>`_, `sIBL_GUI <http://github.com/KelSolaar/sIBL_GUI>`_, `sIBL_Reporter <http://github.com/KelSolaar/sIBL_Reporter>`_. It provides modules defining various utilities classes and definitions used in those packages.
+**Oncilla** is the documentation building helper package of `Oncilla <http://github.com/KelSolaar/Oncilla>`_, `Manager <http://github.com/KelSolaar/Manager>`_, `Umbra <http://github.com/KelSolaar/Umbra>`_, `sIBL_GUI <http://github.com/KelSolaar/sIBL_GUI>`_ and `sIBL_Reporter <http://github.com/KelSolaar/sIBL_Reporter>`_.
 
 .. raw:: html
 
@@ -77,6 +77,7 @@ You will need to have the following environment variables defined:
 -  **ONCILLA_PROJECT_PACKAGES**: Defines the packages you want to build the **Sphinx** documentation.
 -  **ONCILLA_PROJECT_SANITIZER**: Defines the optional **Sphinx** documentation sanitizing **Python** module.
 -  **ONCILLA_PROJECT_EXCLUDED_MODULES**: Defines the optional excluded **Python** modules from **Sphinx** documentation.
+-  **ONCILLA_PROJECT_MANUAL_CSS_FILE**: Defines the optional **css** stylesheet file used for the manual.
 
 Example::
 
