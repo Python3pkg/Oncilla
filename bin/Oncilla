@@ -24,6 +24,7 @@ echo ---------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo Sphinx Documentation Build - Begin
 echo -------------------------------------------------------------------------------
+mkdir -p $SPHINX_DIRECTORY/source/resources/pages/api
 python $ONCILLA_DIRECTORY/sliceReStructuredText.py --input "$HELP_DIRECTORY/${ONCILLA_PROJECT_NAME}_Manual.rst" --output "$SPHINX_DIRECTORY/source/resources/pages"
 python $ONCILLA_DIRECTORY/sliceReStructuredText.py --input "$ONCILLA_PROJECT_DIRECTORY/CHANGES.rst" --output "$SPHINX_DIRECTORY/source/resources/pages"
 python $ONCILLA_DIRECTORY/buildTocTree.py --title "$ONCILLA_PROJECT_NAME" --input "$SPHINX_DIRECTORY/source/resources/pages/tocTree.rst" --output "$SPHINX_DIRECTORY/source/index.rst" --contentDirectory "$SPHINX_DIRECTORY/source/resources/pages"

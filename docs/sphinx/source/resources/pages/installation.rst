@@ -15,7 +15,7 @@ or this alternative command::
 
 	easy_install Oncilla
 
-Alternatively, if you want to directly install from `Github <http://github.com/KelSolaar/Oncilla>`_ source repository::
+You can also directly install from `Github <http://github.com/KelSolaar/Oncilla>`_ source repository::
 
 	git clone git://github.com/KelSolaar/Oncilla.git
 	cd Oncilla
