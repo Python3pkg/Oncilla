@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**buildSphinxDocumentationTocTree.py
+**buildTocTree.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -26,7 +26,7 @@ import sys
 
 def _setEncoding():
 	"""
-	This definition sets the Application encoding.
+	Sets the Application encoding.
 	"""
 
 	reload(sys)
@@ -37,9 +37,11 @@ _setEncoding()
 #**********************************************************************************************************************
 #***	External imports.
 #**********************************************************************************************************************
+import argparse
 import glob
 import os
 import re
+
 if sys.version_info[:2] <= (2, 6):
 	from ordereddict import OrderedDict
 else:
@@ -48,6 +50,7 @@ else:
 #**********************************************************************************************************************
 #***	Internal imports.
 #**********************************************************************************************************************
+import foundations.decorators
 import foundations.strings
 import foundations.verbose
 from foundations.io import File
@@ -63,29 +66,31 @@ __email__ = "thomas.mansencal@gmail.com"
 __status__ = "Production"
 
 __all__ = ["LOGGER",
-		"FILES_EXTENSION",
-		"TOCTREE_TEMPLATE_BEGIN",
-		"TOCTREE_TEMPLATE_END",
-		"getSphinxDocumentationTocTree"]
+		   "FILES_EXTENSION",
+		   "TOCTREE_TEMPLATE_BEGIN",
+		   "TOCTREE_TEMPLATE_END",
+		   "buildTocTree",
+		   "getCommandLineArguments",
+		   "main"]
 
 LOGGER = foundations.verbose.installLogger()
 
 FILES_EXTENSION = ".rst"
 
 TOCTREE_TEMPLATE_BEGIN = ["Welcome to {0} |version|'s documentation!\n",
-						"{0}\n",
-						"\n",
-						"Contents:\n",
-						"\n",
-						".. toctree::\n",
-						" :maxdepth: 2\n",
-						" :numbered:\n"]
+						  "{0}\n",
+						  "\n",
+						  "Contents:\n",
+						  "\n",
+						  ".. toctree::\n",
+						  " :maxdepth: 2\n",
+						  " :numbered:\n"]
 TOCTREE_TEMPLATE_END = ["Search:\n",
-					"==================\n",
-					"\n",
-					"* :ref:`genindex`\n",
-					"* :ref:`modindex`\n",
-					"* :ref:`search`\n", ]
+						"==================\n",
+						"\n",
+						"* :ref:`genindex`\n",
+						"* :ref:`modindex`\n",
+						"* :ref:`search`\n", ]
 
 foundations.verbose.getLoggingConsoleHandler()
 foundations.verbose.setVerbosityLevel(3)
@@ -93,28 +98,30 @@ foundations.verbose.setVerbosityLevel(3)
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def getSphinxDocumentationTocTree(title, fileIn, fileOut, contentDirectory):
+def buildTocTree(title, input, output, contentDirectory):
 	"""
-	This definition gets Sphinx documentation index file.
+	Builds Sphinx documentation table of content tree file.
 
 	:param title: Package title.
 	:type title: unicode
-	:param fileIn: File to convert.
-	:type fileIn: unicode
-	:param fileOut: Output file.
-	:type fileOut: unicode
-	:param contentDirectory: Content directory.
+	:param input: Input file to convert.
+	:type input: unicode
+	:param output: Output file.
+	:type output: unicode
+	:param contentDirectory: Directory containing the content to be included in the table of content.
 	:type contentDirectory: unicode
+	:return: Definition success.
+	:rtype: bool
 	"""
 
-	LOGGER.info("{0} | Building Sphinx documentation index '{1}' file!".format(getSphinxDocumentationTocTree.__name__,
-																				fileOut))
-	file = File(fileIn)
+	LOGGER.info("{0} | Building Sphinx documentation index '{1}' file!".format(buildTocTree.__name__,
+																			   output))
+	file = File(input)
 	file.cache()
 
 	existingFiles = [foundations.strings.getSplitextBasename(item)
-					for item in glob.glob("{0}/*{1}".format(contentDirectory, FILES_EXTENSION))]
-	relativeDirectory = contentDirectory.replace("{0}/".format(os.path.dirname(fileOut)), "")
+					 for item in glob.glob("{0}/*{1}".format(contentDirectory, FILES_EXTENSION))]
+	relativeDirectory = contentDirectory.replace("{0}/".format(os.path.dirname(output)), "")
 
 	tocTree = ["\n"]
 	for line in file.content:
@@ -127,8 +134,8 @@ def getSphinxDocumentationTocTree(title, fileIn, fileOut, contentDirectory):
 		if code in existingFiles:
 			link = "{0}/{1}".format(relativeDirectory, code)
 			data = "{0}{1}{2} <{3}>\n".format(" ", " " * line.index("-"), item, link)
-			LOGGER.info("{0} | Adding '{1}' entry to Toc Tree!".format(getSphinxDocumentationTocTree.__name__,
-																		data.replace("\n", "")))
+			LOGGER.info("{0} | Adding '{1}' entry to Toc Tree!".format(buildTocTree.__name__,
+																	   data.replace("\n", "")))
 			tocTree.append(data)
 	tocTree.append("\n")
 
@@ -138,10 +145,71 @@ def getSphinxDocumentationTocTree(title, fileIn, fileOut, contentDirectory):
 	content.extend(tocTree)
 	content.extend(TOCTREE_TEMPLATE_END)
 
-	file = File(fileOut)
+	file = File(output)
 	file.content = content
 	file.write()
 
+	return True
+
+def getCommandLineArguments():
+	"""
+	Retrieves command line arguments.
+
+	:return: Namespace.
+	:rtype: Namespace
+	"""
+	#
+	parser = argparse.ArgumentParser(add_help=False)
+
+	parser.add_argument("-h",
+						"--help",
+						action="help",
+						help="'Displays this help message and exit.'")
+
+	parser.add_argument("-t",
+						"--title",
+						type=unicode,
+						dest="title",
+						help="'Package title.'")
+
+	parser.add_argument("-i",
+						"--input",
+						type=unicode,
+						dest="input",
+						help="'Input file to convert.'")
+
+	parser.add_argument("-o",
+						"--output",
+						type=unicode,
+						dest="output",
+						help="'Output file.'")
+
+	parser.add_argument("-c",
+						"--contentDirectory",
+						type=unicode,
+						dest="contentDirectory",
+						help="'Content directory.'")
+
+	if len(sys.argv) == 1:
+		parser.print_help()
+		sys.exit(1)
+
+	return parser.parse_args()
+
+@foundations.decorators.systemExit
+def main():
+	"""
+	Starts the Application.
+
+	:return: Definition success.
+	:rtype: bool
+	"""
+
+	args = getCommandLineArguments()
+	return buildTocTree(args.title,
+						args.input,
+						args.output,
+						args.contentDirectory)
+
 if __name__ == "__main__":
-	arguments = map(unicode, sys.argv)
-	getSphinxDocumentationTocTree(arguments[1], arguments[2], arguments[3], arguments[4])
+	main()
