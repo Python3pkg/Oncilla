@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**buildSphinxDocumentationApi.py
+**buildApi.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -26,7 +26,7 @@ import sys
 
 def _setEncoding():
 	"""
-	This definition sets the Application encoding.
+	Sets the Application encoding.
 	"""
 
 	reload(sys)
@@ -37,9 +37,10 @@ _setEncoding()
 #**********************************************************************************************************************
 #***	External imports.
 #**********************************************************************************************************************
+import argparse
 import os
-import re
 import shutil
+
 if sys.version_info[:2] <= (2, 6):
 	from ordereddict import OrderedDict
 else:
@@ -49,6 +50,8 @@ else:
 #***	Internal imports.
 #**********************************************************************************************************************
 import foundations.common
+import foundations.decorators
+import foundations.exceptions
 import foundations.strings
 import foundations.verbose
 import foundations.walkers
@@ -68,40 +71,31 @@ __email__ = "thomas.mansencal@gmail.com"
 __status__ = "Production"
 
 __all__ = ["LOGGER",
-		"FILES_EXTENSION",
-		"TOCTREE_TEMPLATE_BEGIN",
-		"TOCTREE_TEMPLATE_END",
-		"EXCLUDED_PYTHON_MODULES",
-		"STATEMENTS_UPDATE_MESSAGGE",
-		"DECORATORS_COMMENT_MESSAGE",
-		"CONTENT_SUBSTITUTIONS",
-		"getSphinxDocumentationApi"]
+		   "FILES_EXTENSION",
+		   "TOCTREE_TEMPLATE_BEGIN",
+		   "TOCTREE_TEMPLATE_END",
+		   "SANITIZER",
+		   "importSanitizer",
+		   "buildApi",
+		   "getCommandLineArguments",
+		   "main"]
 
 LOGGER = foundations.verbose.installLogger()
 
 FILES_EXTENSION = ".rst"
 
 TOCTREE_TEMPLATE_BEGIN = ["Api\n",
-						"====\n",
-						"\n",
-						"Modules Summary:\n",
-						"\n",
-						".. toctree::\n",
-						"   :maxdepth: 1\n",
-						"\n"]
+						  "====\n",
+						  "\n",
+						  "Modules Summary:\n",
+						  "\n",
+						  ".. toctree::\n",
+						  "   :maxdepth: 1\n",
+						  "\n"]
 
 TOCTREE_TEMPLATE_END = []
 
-EXCLUDED_PYTHON_MODULES = ("tests",)
-
-STATEMENTS_UPDATE_MESSAGGE = "#**********************************************************************************************************************\n" \
-							"#***\tSphinx: Statements updated for auto-documentation purpose.\n" \
-							"#**********************************************************************************************************************"
-
-DECORATORS_COMMENT_MESSAGE = "#***\tSphinx: Decorator commented for auto-documentation purpose."
-
-CONTENT_SUBSTITUTIONS = {"This method initializes the class.\n" :
-						".. Sphinx: Statements updated for auto-documentation purpose.\n"}
+SANITIZER = os.path.join(os.path.dirname(__file__), "defaultSanitizer.py")
 
 foundations.verbose.getLoggingConsoleHandler()
 foundations.verbose.setVerbosityLevel(3)
@@ -109,107 +103,98 @@ foundations.verbose.setVerbosityLevel(3)
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def getSphinxDocumentationApi(packages, cloneDirectory, outputDirectory, apiFile):
+def importSanitizer(sanitizer):
 	"""
-	This definition gets Sphinx documentation API.
+	Imports the sanitizer python module.
 
-	:param packages: Packages.
-	:type packages: unicode
-	:param cloneDirectory: Source clone directory.
-	:type cloneDirectory: unicode
-	:param outputDirectory: Content directory.
-	:type outputDirectory: unicode
-	:param apiFile: API file.
-	:type apiFile: unicode
+	:param sanitizer: Sanitizer python module file.
+	:type sanitizer: unicode
+	:return: Module.
+	:rtype: object
 	"""
 
-	LOGGER.info("{0} | Building Sphinx documentation API!".format(getSphinxDocumentationApi.__name__))
+	directory = os.path.dirname(sanitizer)
+	not directory in sys.path and sys.path.append(directory)
 
-	if os.path.exists(cloneDirectory):
-		shutil.rmtree(cloneDirectory)
-		os.makedirs(cloneDirectory)
+	namespace = __import__(foundations.strings.getSplitextBasename(sanitizer))
+	if hasattr(namespace, "bleach"):
+		return namespace
+	else:
+		raise foundations.exceptions.ProgrammingError(
+		"{0} | '{1}' is not a valid sanitizer module file!".format(sanitizer))
 
-	packagesModules = {"apiModules" : [],
-					"testsModules" : []}
-	for package in packages.split(","):
+def buildApi(packages, input, output, sanitizer, excludedModules=None):
+	"""
+	Builds the Sphinx documentation API.
+
+	:param packages: Packages to include in the API.
+	:type packages: list
+	:param input: Input modules directory.
+	:type input: unicode
+	:param output: Output reStructuredText files directory.
+	:type output: unicode
+	:param sanitizer: Sanitizer python module.
+	:type sanitizer: unicode
+	:param excludedModules: Excluded modules.
+	:type excludedModules: list
+	:return: Definition success.
+	:rtype: bool
+	"""
+
+	LOGGER.info("{0} | Building Sphinx documentation API!".format(buildApi.__name__))
+
+	sanitizer = importSanitizer(sanitizer)
+
+	if os.path.exists(input):
+		shutil.rmtree(input)
+		os.makedirs(input)
+
+	excludedModules = [] if excludedModules is None else excludedModules
+
+	packagesModules = {"apiModules": [],
+					   "testsModules": []}
+	for package in packages:
 		package = __import__(package)
 		path = foundations.common.getFirstItem(package.__path__)
-		sourceDirectory = os.path.dirname(path)
+		packageDirectory = os.path.dirname(path)
 
-		for file in sorted(list(foundations.walkers.filesWalker(sourceDirectory, filtersIn=("{0}.*\.ui$".format(path),)))):
-			LOGGER.info("{0} | Ui file: '{1}'".format(getSphinxDocumentationApi.__name__, file))
-			targetDirectory = os.path.dirname(file).replace(sourceDirectory, "")
-			directory = "{0}{1}".format(cloneDirectory, targetDirectory)
+		for file in sorted(
+				list(foundations.walkers.filesWalker(packageDirectory, filtersIn=("{0}.*\.ui$".format(path),)))):
+			LOGGER.info("{0} | Ui file: '{1}'".format(buildApi.__name__, file))
+			targetDirectory = os.path.dirname(file).replace(packageDirectory, "")
+			directory = "{0}{1}".format(input, targetDirectory)
 			if not foundations.common.pathExists(directory):
 				os.makedirs(directory)
 			source = os.path.join(directory, os.path.basename(file))
 			shutil.copyfile(file, source)
 
 		modules = []
-		for file in sorted(list(foundations.walkers.filesWalker(sourceDirectory, filtersIn=("{0}.*\.py$".format(path),),
-		filtersOut=EXCLUDED_PYTHON_MODULES))):
-			LOGGER.info("{0} | Python file: '{1}'".format(getSphinxDocumentationApi.__name__, file))
-			module = "{0}.{1}" .format((".".join(os.path.dirname(file).replace(sourceDirectory, "").split("/"))),
-												foundations.strings.getSplitextBasename(file)).strip(".")
-			LOGGER.info("{0} | Module name: '{1}'".format(getSphinxDocumentationApi.__name__, module))
-			directory = os.path.dirname(os.path.join(cloneDirectory, module.replace(".", "/")))
+		for file in sorted(
+				list(foundations.walkers.filesWalker(packageDirectory, filtersIn=("{0}.*\.py$".format(path),),
+													 filtersOut=excludedModules))):
+			LOGGER.info("{0} | Python file: '{1}'".format(buildApi.__name__, file))
+			module = "{0}.{1}".format((".".join(os.path.dirname(file).replace(packageDirectory, "").split("/"))),
+									  foundations.strings.getSplitextBasename(file)).strip(".")
+			LOGGER.info("{0} | Module name: '{1}'".format(buildApi.__name__, module))
+			directory = os.path.dirname(os.path.join(input, module.replace(".", "/")))
 			if not foundations.common.pathExists(directory):
 				os.makedirs(directory)
 			source = os.path.join(directory, os.path.basename(file))
 			shutil.copyfile(file, source)
 
-			sourceFile = File(source)
-			sourceFile.cache()
-			trimFromIndex = trimEndIndex = None
-			inMultilineString = inDecorator = False
-			for i, line in enumerate(sourceFile.content):
-				if re.search(r"__name__ +\=\= +\"__main__\"", line):
-					trimFromIndex = i
-				for pattern, value in CONTENT_SUBSTITUTIONS.iteritems():
-					if re.search(pattern, line):
-						sourceFile.content[i] = re.sub(pattern, value, line)
-
-				strippedLine = line.strip()
-				if re.search(r"^\"\"\"", strippedLine):
-					inMultilineString = not inMultilineString
-
-				if inMultilineString:
-					continue
-
-				if re.search(r"^@\w+", strippedLine) and \
-				not re.search(r"@property", strippedLine) and \
-				not re.search(r"^@\w+\.setter", strippedLine) and \
-				not re.search(r"^@\w+\.deleter", strippedLine):
-					inDecorator = True
-					indent = re.search(r"^([ \t]*)", line)
-
-				if re.search(r"^[ \t]*def \w+", sourceFile.content[i]) or \
-					re.search(r"^[ \t]*class \w+", sourceFile.content[i]):
-					inDecorator = False
-
-				if not inDecorator:
-					continue
-
-				sourceFile.content[i] = "{0}{1} {2}".format(indent.groups()[0], DECORATORS_COMMENT_MESSAGE, line)
-
-			if trimFromIndex:
-				LOGGER.info("{0} | Trimming '__main__' statements!".format(getSphinxDocumentationApi.__name__))
-				content = [sourceFile.content[i] for i in range(trimFromIndex)]
-				content.append("{0}\n".format(STATEMENTS_UPDATE_MESSAGGE))
-				sourceFile.content = content
-			sourceFile.write()
+			sanitizer.bleach(source)
 
 			if "__init__.py" in file:
 				continue
 
 			rstFilePath = "{0}{1}".format(module, FILES_EXTENSION)
-			LOGGER.info("{0} | Building API file: '{1}'".format(getSphinxDocumentationApi.__name__, rstFilePath))
-			rstFile = File(os.path.join(outputDirectory, rstFilePath))
+			LOGGER.info("{0} | Building API file: '{1}'".format(buildApi.__name__, rstFilePath))
+			rstFile = File(os.path.join(output, rstFilePath))
 			header = ["_`{0}`\n".format(module),
-					"==={0}\n".format("="*len(module)),
-					"\n",
-					".. automodule:: {0}\n".format(module),
-					"\n"]
+					  "==={0}\n".format("=" * len(module)),
+					  "\n",
+					  ".. automodule:: {0}\n".format(module),
+					  "\n"]
 			rstFile.content.extend(header)
 
 			functions = OrderedDict()
@@ -221,8 +206,8 @@ def getSphinxDocumentationApi(packages, cloneDirectory, outputDirectory, apiFile
 						functions[member] = [".. autofunction:: {0}\n".format(member)]
 				elif object.__class__ == moduleBrowser.Class:
 					classes[member] = [".. autoclass:: {0}\n".format(member),
-										"	:show-inheritance:\n",
-										"	:members:\n"]
+									   "	:show-inheritance:\n",
+									   "	:members:\n"]
 				elif object.__class__ == moduleBrowser.Global:
 					if not member.startswith("_"):
 						moduleAttributes[member] = [".. attribute:: {0}.{1}\n".format(module, member)]
@@ -248,7 +233,7 @@ def getSphinxDocumentationApi(packages, cloneDirectory, outputDirectory, apiFile
 		packagesModules["apiModules"].extend([module for module in modules if not "tests" in module])
 		packagesModules["testsModules"].extend([module for module in modules if "tests" in module])
 
-	apiFile = File(apiFile)
+	apiFile = File("{0}{1}".format(output, FILES_EXTENSION))
 	apiFile.content.extend(TOCTREE_TEMPLATE_BEGIN)
 	for module in packagesModules["apiModules"]:
 		apiFile.content.append("   {0} <{1}>\n".format(module, "api/{0}".format(module)))
@@ -257,6 +242,76 @@ def getSphinxDocumentationApi(packages, cloneDirectory, outputDirectory, apiFile
 	apiFile.content.extend(TOCTREE_TEMPLATE_END)
 	apiFile.write()
 
+	return True
+
+def getCommandLineArguments():
+	"""
+	Retrieves command line arguments.
+
+	:return: Namespace.
+	:rtype: Namespace
+	"""
+
+	parser = argparse.ArgumentParser(add_help=False)
+
+	parser.add_argument("-h",
+						"--help",
+						action="help",
+						help="'Displays this help message and exit.'")
+
+	parser.add_argument("-p",
+						"--packages",
+						dest="packages",
+						nargs="+",
+						help="'Packages to include in the API.'")
+
+	parser.add_argument("-i",
+						"--input",
+						type=unicode,
+						dest="input",
+						help="'Input modules directory.'")
+
+	parser.add_argument("-o",
+						"--output",
+						type=unicode,
+						dest="output",
+						help="'Output reStructuredText files directory.'")
+
+	parser.add_argument("-s",
+						"--sanitizer",
+						type=unicode,
+						dest="sanitizer",
+						help="'Sanitizer python module'")
+
+	parser.add_argument("-x",
+						"--excludedModules",
+						dest="excludedModules",
+						nargs="*",
+						help="'Excluded modules.'")
+
+	if len(sys.argv) == 1:
+		parser.print_help()
+		sys.exit(1)
+
+	return parser.parse_args()
+
+@foundations.decorators.systemExit
+def main():
+	"""
+	Starts the Application.
+
+	:return: Definition success.
+	:rtype: bool
+	"""
+
+	args = getCommandLineArguments()
+	args.sanitizer = args.sanitizer if foundations.common.pathExists(args.sanitizer) else SANITIZER
+	args.excludedModules = args.excludedModules if all(args.excludedModules) else []
+	return buildApi(args.packages,
+					args.input,
+					args.output,
+					args.sanitizer,
+					args.excludedModules)
+
 if __name__ == "__main__":
-	arguments = map(unicode, sys.argv)
-	getSphinxDocumentationApi(arguments[1], arguments[2], arguments[3], arguments[4])
+	main()

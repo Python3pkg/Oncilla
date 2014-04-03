@@ -3,8 +3,15 @@
 .project
 .pydevproject
 .settings
+MANIFEST
 
 *.exe
 *.log
 *.pyc
 *.pyo
+
+Oncilla.egg-info/
+dist/
+docs/sphinx/build/
+docs/sphinx/source/resources/packages/
+releases/

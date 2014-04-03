@@ -1,19 +1,3 @@
-Oncilla - 0.1.0 - Alpha
-=======================
-
-.. .changes
-
-Changes
-=======
-
-
-0.1.0 - Alpha
--------------
-
--  Initial release of **Oncilla**.
-
-.. .about
-
 About
 -----
 

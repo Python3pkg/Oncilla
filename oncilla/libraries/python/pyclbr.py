@@ -44,6 +44,7 @@ import imp
 import tokenize
 from token import NAME, DEDENT, OP
 from operator import itemgetter
+
 if sys.version_info[:2] <= (2, 6):
 	from ordereddict import OrderedDict
 else:
@@ -51,11 +52,12 @@ else:
 
 __all__ = ["readmodule", "readmodule_ex", "Class", "Function"]
 
-_modules = {}							# cache of modules we've seen
+_modules = {}  # cache of modules we've seen
 
 # each Python class is represented by an instance of this class
 class Class:
 	'''Class to represent a Python class.'''
+
 	def __init__(self, module, name, super, file, lineno):
 		self.module = module
 		self.name = name
@@ -71,6 +73,7 @@ class Class:
 
 class Function:
 	'''Class to represent a top-level Python function'''
+
 	def __init__(self, module, name, file, lineno):
 		self.module = module
 		self.name = name
@@ -79,6 +82,7 @@ class Function:
 
 class Global:
 	'''Class to represent a top-level Python global'''
+
 	def __init__(self, module, name, file, lineno):
 		self.module = module
 		self.name = name
@@ -158,7 +162,7 @@ def _readmodule(module, path, inpackage=None):
 		f.close()
 		return dict
 
-	stack = [] # stack of (class, indent) pairs
+	stack = []  # stack of (class, indent) pairs
 
 	g = tokenize.generate_tokens(f.readline)
 	try:
@@ -175,7 +179,7 @@ def _readmodule(module, path, inpackage=None):
 					del stack[-1]
 				tokentype, meth_name, start = g.next()[0:3]
 				if tokentype != NAME:
-					continue # Syntax error
+					continue  # Syntax error
 				if stack:
 					cur_class = stack[-1][0]
 					if isinstance(cur_class, Class):
@@ -186,7 +190,7 @@ def _readmodule(module, path, inpackage=None):
 					# it's a function
 					dict[meth_name] = Function(fullmodule, meth_name,
 											   fname, lineno)
-				stack.append((None, thisindent)) # Marker for nested fns
+				stack.append((None, thisindent))  # Marker for nested fns
 			elif token == 'class':
 				lineno, thisindent = start
 				# close previous nested classes and defs
@@ -194,15 +198,15 @@ def _readmodule(module, path, inpackage=None):
 					del stack[-1]
 				tokentype, class_name, start = g.next()[0:3]
 				if tokentype != NAME:
-					continue # Syntax error
+					continue  # Syntax error
 				# parse what follows the class name
 				tokentype, token, start = g.next()[0:3]
 				inherit = None
 				if token == '(':
-					names = [] # List of superclasses
+					names = []  # List of superclasses
 					# there's a list of superclasses
 					level = 1
-					super = [] # Tokens making up current superclass
+					super = []  # Tokens making up current superclass
 					while True:
 						tokentype, token, start = g.next()[0:3]
 						if token in (')', ',') and level == 1:
@@ -334,6 +338,7 @@ def _getname(g):
 def _main():
 	# Main program for testing.
 	import os
+
 	mod = sys.argv[1]
 	if os.path.exists(mod):
 		path = [os.path.dirname(mod)]
