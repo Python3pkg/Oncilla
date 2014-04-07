@@ -1,11 +1,11 @@
-.. image:: https://badge.waffle.io/kelsolaar/oncilla.png?label=ready&title=Ready 
- :target: https://waffle.io/kelsolaar/oncilla
- :alt: 'Stories in Ready'
 Oncilla
 =======
 
 ..  image:: https://secure.travis-ci.org/KelSolaar/Oncilla.png?branch=master
 ..  image:: https://gemnasium.com/KelSolaar/Oncilla.png
+.. image:: https://badge.waffle.io/kelsolaar/oncilla.png?label=ready&title=Ready 
+ :target: https://waffle.io/kelsolaar/oncilla
+ :alt: 'Stories in Ready'
 
 Introduction
 ------------
