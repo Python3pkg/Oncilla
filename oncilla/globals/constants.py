@@ -102,7 +102,7 @@ class Constants():
 	:type loggingSeparators: unicode
 	"""
 
-	defaultCodec = oncilla.DEFAULT_CODEC
+	defaultCodec = "utf-8"
 	"""
 	:param defaultCodec: Default codec.
 	:type defaultCodec: unicode

@@ -20,26 +20,12 @@
 from __future__ import unicode_literals
 
 #**********************************************************************************************************************
-#***	Encoding manipulations.
-#**********************************************************************************************************************
-import sys
-
-def _setEncoding():
-	"""
-	Sets the Application encoding.
-	"""
-
-	reload(sys)
-	sys.setdefaultencoding("utf-8")
-
-_setEncoding()
-
-#**********************************************************************************************************************
 #***	External imports.
 #**********************************************************************************************************************
 import argparse
 import os
 import re
+import sys
 
 if sys.version_info[:2] <= (2, 6):
 	from ordereddict import OrderedDict
