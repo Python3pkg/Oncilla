@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**sliceReStructuredText.py**
+**slice_reStructuredText.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -54,11 +54,11 @@ __all__ = ["LOGGER",
 		   "SLICE_ATTRIBUTE_INDENT",
 		   "CONTENT_DELETION",
 		   "STATEMENT_SUBSTITUTE",
-		   "sliceReStructuredText",
-		   "getCommandLineArguments",
+		   "slice_reStructuredText",
+		   "get_command_line_arguments",
 		   "main"]
 
-LOGGER = foundations.verbose.installLogger()
+LOGGER = foundations.verbose.install_logger()
 
 OUTPUT_FILES_EXTENSION = "rst"
 SLICE_ATTRIBUTE_INDENT = 2
@@ -66,13 +66,13 @@ CONTENT_DELETION = ()
 STATEMENT_SUBSTITUTE = {"resources/": "../",
 						 "     \|": "            |"}
 
-foundations.verbose.getLoggingConsoleHandler()
-foundations.verbose.setVerbosityLevel(3)
+foundations.verbose.get_logging_console_handler()
+foundations.verbose.set_verbosity_level(3)
 
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def sliceReStructuredText(input, output):
+def slice_reStructuredText(input, output):
 	"""
 	Slices given reStructuredText file.
 
@@ -84,7 +84,7 @@ def sliceReStructuredText(input, output):
 	:rtype: bool
 	"""
 
-	LOGGER.info("{0} | Slicing '{1}' file!".format(sliceReStructuredText.__name__, input))
+	LOGGER.info("{0} | Slicing '{1}' file!".format(slice_reStructuredText.__name__, input))
 	file = File(input)
 	file.cache()
 
@@ -95,23 +95,23 @@ def sliceReStructuredText(input, output):
 			slices[search.groups()[0]] = i + SLICE_ATTRIBUTE_INDENT
 
 	index = 0
-	for slice, sliceStart in slices.iteritems():
-		sliceFile = File(os.path.join(output, "{0}.{1}".format(slice, OUTPUT_FILES_EXTENSION)))
-		LOGGER.info("{0} | Outputing '{1}' file!".format(sliceReStructuredText.__name__, sliceFile.path))
-		sliceEnd = index < (len(slices.values()) - 1) and slices.values()[index + 1] - SLICE_ATTRIBUTE_INDENT or \
+	for slice, slice_start in slices.iteritems():
+		slice_file = File(os.path.join(output, "{0}.{1}".format(slice, OUTPUT_FILES_EXTENSION)))
+		LOGGER.info("{0} | Outputing '{1}' file!".format(slice_reStructuredText.__name__, slice_file.path))
+		slice_end = index < (len(slices.values()) - 1) and slices.values()[index + 1] - SLICE_ATTRIBUTE_INDENT or \
 				   len(file.content)
 
-		for i in range(sliceStart, sliceEnd):
-			skipLine = False
+		for i in range(slice_start, slice_end):
+			skip_line = False
 			for item in CONTENT_DELETION:
 				if re.search(item, file.content[i]):
-					LOGGER.info("{0} | Skipping Line '{1}' with '{2}' content!".format(sliceReStructuredText.__name__,
+					LOGGER.info("{0} | Skipping Line '{1}' with '{2}' content!".format(slice_reStructuredText.__name__,
 																					   i,
 																					   item))
-					skipLine = True
+					skip_line = True
 					break
 
-			if skipLine:
+			if skip_line:
 				continue
 
 			line = file.content[i]
@@ -120,18 +120,18 @@ def sliceReStructuredText(input, output):
 
 			search = re.search(r"-  `[\w ]+`_ \(([\w\.]+)\)", line)
 			if search:
-				LOGGER.info("{0} | Updating Line '{1}' link: '{2}'!".format(sliceReStructuredText.__name__,
+				LOGGER.info("{0} | Updating Line '{1}' link: '{2}'!".format(slice_reStructuredText.__name__,
 																			i,
 																			search.groups()[0]))
 				line = "-  :ref:`{0}`\n".format(search.groups()[0])
-			sliceFile.content.append(line)
+			slice_file.content.append(line)
 
-		sliceFile.write()
+		slice_file.write()
 		index += 1
 
 	return True
 
-def getCommandLineArguments():
+def get_command_line_arguments():
 	"""
 	Retrieves command line arguments.
 
@@ -164,7 +164,7 @@ def getCommandLineArguments():
 
 	return parser.parse_args()
 
-@foundations.decorators.systemExit
+@foundations.decorators.system_exit
 def main():
 	"""
 	Starts the Application.
@@ -173,8 +173,8 @@ def main():
 	:rtype: bool
 	"""
 
-	args = getCommandLineArguments()
-	return sliceReStructuredText(args.input,
+	args = get_command_line_arguments()
+	return slice_reStructuredText(args.input,
 								 args.output)
 
 if __name__ == "__main__":

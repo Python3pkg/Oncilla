@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**buildTocTree.py**
+**build_toc_tree.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -55,11 +55,11 @@ __all__ = ["LOGGER",
 		   "FILES_EXTENSION",
 		   "TOCTREE_TEMPLATE_BEGIN",
 		   "TOCTREE_TEMPLATE_END",
-		   "buildTocTree",
-		   "getCommandLineArguments",
+		   "build_toc_tree",
+		   "get_command_line_arguments",
 		   "main"]
 
-LOGGER = foundations.verbose.installLogger()
+LOGGER = foundations.verbose.install_logger()
 
 FILES_EXTENSION = ".rst"
 
@@ -78,13 +78,13 @@ TOCTREE_TEMPLATE_END = ["Search:\n",
 						"* :ref:`modindex`\n",
 						"* :ref:`search`\n", ]
 
-foundations.verbose.getLoggingConsoleHandler()
-foundations.verbose.setVerbosityLevel(3)
+foundations.verbose.get_logging_console_handler()
+foundations.verbose.set_verbosity_level(3)
 
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def buildTocTree(title, input, output, contentDirectory):
+def build_toc_tree(title, input, output, content_directory):
 	"""
 	Builds Sphinx documentation table of content tree file.
 
@@ -94,22 +94,22 @@ def buildTocTree(title, input, output, contentDirectory):
 	:type input: unicode
 	:param output: Output file.
 	:type output: unicode
-	:param contentDirectory: Directory containing the content to be included in the table of content.
-	:type contentDirectory: unicode
+	:param content_directory: Directory containing the content to be included in the table of content.
+	:type content_directory: unicode
 	:return: Definition success.
 	:rtype: bool
 	"""
 
-	LOGGER.info("{0} | Building Sphinx documentation index '{1}' file!".format(buildTocTree.__name__,
+	LOGGER.info("{0} | Building Sphinx documentation index '{1}' file!".format(build_toc_tree.__name__,
 																			   output))
 	file = File(input)
 	file.cache()
 
-	existingFiles = [foundations.strings.getSplitextBasename(item)
-					 for item in glob.glob("{0}/*{1}".format(contentDirectory, FILES_EXTENSION))]
-	relativeDirectory = contentDirectory.replace("{0}/".format(os.path.dirname(output)), "")
+	existing_files = [foundations.strings.get_splitext_basename(item)
+					 for item in glob.glob("{0}/*{1}".format(content_directory, FILES_EXTENSION))]
+	relative_directory = content_directory.replace("{0}/".format(os.path.dirname(output)), "")
 
-	tocTree = ["\n"]
+	toc_tree = ["\n"]
 	for line in file.content:
 		search = re.search(r"`([a-zA-Z_ ]+)`_", line)
 		if not search:
@@ -117,18 +117,18 @@ def buildTocTree(title, input, output, contentDirectory):
 
 		item = search.groups()[0]
 		code = "{0}{1}".format(item[0].lower(), item.replace(" ", "")[1:])
-		if code in existingFiles:
-			link = "{0}/{1}".format(relativeDirectory, code)
+		if code in existing_files:
+			link = "{0}/{1}".format(relative_directory, code)
 			data = "{0}{1}{2} <{3}>\n".format(" ", " " * line.index("-"), item, link)
-			LOGGER.info("{0} | Adding '{1}' entry to Toc Tree!".format(buildTocTree.__name__,
+			LOGGER.info("{0} | Adding '{1}' entry to Toc Tree!".format(build_toc_tree.__name__,
 																	   data.replace("\n", "")))
-			tocTree.append(data)
-	tocTree.append("\n")
+			toc_tree.append(data)
+	toc_tree.append("\n")
 
 	TOCTREE_TEMPLATE_BEGIN[0] = TOCTREE_TEMPLATE_BEGIN[0].format(title)
 	TOCTREE_TEMPLATE_BEGIN[1] = TOCTREE_TEMPLATE_BEGIN[1].format("=" * len(TOCTREE_TEMPLATE_BEGIN[0]))
 	content = TOCTREE_TEMPLATE_BEGIN
-	content.extend(tocTree)
+	content.extend(toc_tree)
 	content.extend(TOCTREE_TEMPLATE_END)
 
 	file = File(output)
@@ -137,14 +137,14 @@ def buildTocTree(title, input, output, contentDirectory):
 
 	return True
 
-def getCommandLineArguments():
+def get_command_line_arguments():
 	"""
 	Retrieves command line arguments.
 
 	:return: Namespace.
 	:rtype: Namespace
 	"""
-	#
+
 	parser = argparse.ArgumentParser(add_help=False)
 
 	parser.add_argument("-h",
@@ -171,9 +171,9 @@ def getCommandLineArguments():
 						help="'Output file.'")
 
 	parser.add_argument("-c",
-						"--contentDirectory",
+						"--content_directory",
 						type=unicode,
-						dest="contentDirectory",
+						dest="content_directory",
 						help="'Content directory.'")
 
 	if len(sys.argv) == 1:
@@ -182,7 +182,7 @@ def getCommandLineArguments():
 
 	return parser.parse_args()
 
-@foundations.decorators.systemExit
+@foundations.decorators.system_exit
 def main():
 	"""
 	Starts the Application.
@@ -191,11 +191,11 @@ def main():
 	:rtype: bool
 	"""
 
-	args = getCommandLineArguments()
-	return buildTocTree(args.title,
+	args = get_command_line_arguments()
+	return build_toc_tree(args.title,
 						args.input,
 						args.output,
-						args.contentDirectory)
+						args.content_directory)
 
 if __name__ == "__main__":
 	main()

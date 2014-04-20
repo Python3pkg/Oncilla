@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**defaultSanitizer.py**
+**default_sanitizer.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -45,7 +45,7 @@ __all__ = ["LOGGER",
 		   "STATEMENT_SUBSTITUTE",
 		   "bleach"]
 
-LOGGER = foundations.verbose.installLogger()
+LOGGER = foundations.verbose.install_logger()
 
 STATEMENT_UPDATE_MESSAGE = "# Oncilla: Statement commented by auto-documentation process: "
 
@@ -67,8 +67,8 @@ def bleach(file):
 
 	LOGGER.info("{0} | Sanitizing '{1}' python module!".format(__name__, file))
 
-	sourceFile = File(file)
-	content = sourceFile.read()
+	source_file = File(file)
+	content = source_file.read()
 	for pattern in STATEMENT_SUBSTITUTE:
 		matches = [match for match in re.finditer(pattern, content, re.DOTALL)]
 
@@ -83,7 +83,7 @@ def bleach(file):
 							   content[end + offset:]))
 			offset += len(substitution) - len(match.group("bleach"))
 
-	sourceFile.content = [content]
-	sourceFile.write()
+	source_file.content = [content]
+	source_file.write()
 
 	return True

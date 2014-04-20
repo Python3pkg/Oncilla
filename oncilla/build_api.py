@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**buildApi.py**
+**build_api.py**
 
 **Platform:**
 	Windows, Linux, Mac Os X.
@@ -44,7 +44,7 @@ import foundations.walkers
 from foundations.io import File
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "libraries"))
-import python.pyclbr as moduleBrowser
+import python.pyclbr as module_browser
 
 #**********************************************************************************************************************
 #***	Module attributes.
@@ -61,12 +61,12 @@ __all__ = ["LOGGER",
 		   "TOCTREE_TEMPLATE_BEGIN",
 		   "TOCTREE_TEMPLATE_END",
 		   "SANITIZER",
-		   "importSanitizer",
-		   "buildApi",
-		   "getCommandLineArguments",
+		   "import_sanitizer",
+		   "build_api",
+		   "get_command_line_arguments",
 		   "main"]
 
-LOGGER = foundations.verbose.installLogger()
+LOGGER = foundations.verbose.install_logger()
 
 FILES_EXTENSION = ".rst"
 
@@ -81,15 +81,15 @@ TOCTREE_TEMPLATE_BEGIN = ["Api\n",
 
 TOCTREE_TEMPLATE_END = []
 
-SANITIZER = os.path.join(os.path.dirname(__file__), "defaultSanitizer.py")
+SANITIZER = os.path.join(os.path.dirname(__file__), "default_sanitizer.py")
 
-foundations.verbose.getLoggingConsoleHandler()
-foundations.verbose.setVerbosityLevel(3)
+foundations.verbose.get_logging_console_handler()
+foundations.verbose.set_verbosity_level(3)
 
 #**********************************************************************************************************************
 #***	Module classes and definitions.
 #**********************************************************************************************************************
-def importSanitizer(sanitizer):
+def import_sanitizer(sanitizer):
 	"""
 	Imports the sanitizer python module.
 
@@ -102,14 +102,14 @@ def importSanitizer(sanitizer):
 	directory = os.path.dirname(sanitizer)
 	not directory in sys.path and sys.path.append(directory)
 
-	namespace = __import__(foundations.strings.getSplitextBasename(sanitizer))
+	namespace = __import__(foundations.strings.get_splitext_basename(sanitizer))
 	if hasattr(namespace, "bleach"):
 		return namespace
 	else:
 		raise foundations.exceptions.ProgrammingError(
 		"{0} | '{1}' is not a valid sanitizer module file!".format(sanitizer))
 
-def buildApi(packages, input, output, sanitizer, excludedModules=None):
+def build_api(packages, input, output, sanitizer, excluded_modules=None):
 	"""
 	Builds the Sphinx documentation API.
 
@@ -121,49 +121,49 @@ def buildApi(packages, input, output, sanitizer, excludedModules=None):
 	:type output: unicode
 	:param sanitizer: Sanitizer python module.
 	:type sanitizer: unicode
-	:param excludedModules: Excluded modules.
-	:type excludedModules: list
+	:param excluded_modules: Excluded modules.
+	:type excluded_modules: list
 	:return: Definition success.
 	:rtype: bool
 	"""
 
-	LOGGER.info("{0} | Building Sphinx documentation API!".format(buildApi.__name__))
+	LOGGER.info("{0} | Building Sphinx documentation API!".format(build_api.__name__))
 
-	sanitizer = importSanitizer(sanitizer)
+	sanitizer = import_sanitizer(sanitizer)
 
 	if os.path.exists(input):
 		shutil.rmtree(input)
 		os.makedirs(input)
 
-	excludedModules = [] if excludedModules is None else excludedModules
+	excluded_modules = [] if excluded_modules is None else excluded_modules
 
-	packagesModules = {"apiModules": [],
+	packages_modules = {"apiModules": [],
 					   "testsModules": []}
 	for package in packages:
 		package = __import__(package)
-		path = foundations.common.getFirstItem(package.__path__)
-		packageDirectory = os.path.dirname(path)
+		path = foundations.common.get_first_item(package.__path__)
+		package_directory = os.path.dirname(path)
 
 		for file in sorted(
-				list(foundations.walkers.filesWalker(packageDirectory, filtersIn=("{0}.*\.ui$".format(path),)))):
-			LOGGER.info("{0} | Ui file: '{1}'".format(buildApi.__name__, file))
-			targetDirectory = os.path.dirname(file).replace(packageDirectory, "")
-			directory = "{0}{1}".format(input, targetDirectory)
-			if not foundations.common.pathExists(directory):
+				list(foundations.walkers.files_walker(package_directory, filters_in=("{0}.*\.ui$".format(path),)))):
+			LOGGER.info("{0} | Ui file: '{1}'".format(build_api.__name__, file))
+			target_directory = os.path.dirname(file).replace(package_directory, "")
+			directory = "{0}{1}".format(input, target_directory)
+			if not foundations.common.path_exists(directory):
 				os.makedirs(directory)
 			source = os.path.join(directory, os.path.basename(file))
 			shutil.copyfile(file, source)
 
 		modules = []
 		for file in sorted(
-				list(foundations.walkers.filesWalker(packageDirectory, filtersIn=("{0}.*\.py$".format(path),),
-													 filtersOut=excludedModules))):
-			LOGGER.info("{0} | Python file: '{1}'".format(buildApi.__name__, file))
-			module = "{0}.{1}".format((".".join(os.path.dirname(file).replace(packageDirectory, "").split("/"))),
-									  foundations.strings.getSplitextBasename(file)).strip(".")
-			LOGGER.info("{0} | Module name: '{1}'".format(buildApi.__name__, module))
+				list(foundations.walkers.files_walker(package_directory, filters_in=("{0}.*\.py$".format(path),),
+													 filters_out=excluded_modules))):
+			LOGGER.info("{0} | Python file: '{1}'".format(build_api.__name__, file))
+			module = "{0}.{1}".format((".".join(os.path.dirname(file).replace(package_directory, "").split("/"))),
+									  foundations.strings.get_splitext_basename(file)).strip(".")
+			LOGGER.info("{0} | Module name: '{1}'".format(build_api.__name__, module))
 			directory = os.path.dirname(os.path.join(input, module.replace(".", "/")))
-			if not foundations.common.pathExists(directory):
+			if not foundations.common.path_exists(directory):
 				os.makedirs(directory)
 			source = os.path.join(directory, os.path.basename(file))
 			shutil.copyfile(file, source)
@@ -173,64 +173,64 @@ def buildApi(packages, input, output, sanitizer, excludedModules=None):
 			if "__init__.py" in file:
 				continue
 
-			rstFilePath = "{0}{1}".format(module, FILES_EXTENSION)
-			LOGGER.info("{0} | Building API file: '{1}'".format(buildApi.__name__, rstFilePath))
-			rstFile = File(os.path.join(output, rstFilePath))
+			rst_file_path = "{0}{1}".format(module, FILES_EXTENSION)
+			LOGGER.info("{0} | Building API file: '{1}'".format(build_api.__name__, rst_file_path))
+			rst_file = File(os.path.join(output, rst_file_path))
 			header = ["_`{0}`\n".format(module),
 					  "==={0}\n".format("=" * len(module)),
 					  "\n",
 					  ".. automodule:: {0}\n".format(module),
 					  "\n"]
-			rstFile.content.extend(header)
+			rst_file.content.extend(header)
 
 			functions = OrderedDict()
 			classes = OrderedDict()
-			moduleAttributes = OrderedDict()
-			for member, object in moduleBrowser._readmodule(module, [source, ]).iteritems():
-				if object.__class__ == moduleBrowser.Function:
+			module_attributes = OrderedDict()
+			for member, object in module_browser._readmodule(module, [source, ]).iteritems():
+				if object.__class__ == module_browser.Function:
 					if not member.startswith("_"):
 						functions[member] = [".. autofunction:: {0}\n".format(member)]
-				elif object.__class__ == moduleBrowser.Class:
+				elif object.__class__ == module_browser.Class:
 					classes[member] = [".. autoclass:: {0}\n".format(member),
 									   "	:show-inheritance:\n",
 									   "	:members:\n"]
-				elif object.__class__ == moduleBrowser.Global:
+				elif object.__class__ == module_browser.Global:
 					if not member.startswith("_"):
-						moduleAttributes[member] = [".. attribute:: {0}.{1}\n".format(module, member)]
+						module_attributes[member] = [".. attribute:: {0}.{1}\n".format(module, member)]
 
-			moduleAttributes and rstFile.content.append("Module Attributes\n-----------------\n\n")
-			for moduleAttribute in moduleAttributes.itervalues():
-				rstFile.content.extend(moduleAttribute)
-				rstFile.content.append("\n")
+			module_attributes and rst_file.content.append("Module Attributes\n-----------------\n\n")
+			for module_attribute in module_attributes.itervalues():
+				rst_file.content.extend(module_attribute)
+				rst_file.content.append("\n")
 
-			functions and rstFile.content.append("Functions\n---------\n\n")
+			functions and rst_file.content.append("Functions\n---------\n\n")
 			for function in functions.itervalues():
-				rstFile.content.extend(function)
-				rstFile.content.append("\n")
+				rst_file.content.extend(function)
+				rst_file.content.append("\n")
 
-			classes and rstFile.content.append("Classes\n-------\n\n")
+			classes and rst_file.content.append("Classes\n-------\n\n")
 			for class_ in classes.itervalues():
-				rstFile.content.extend(class_)
-				rstFile.content.append("\n")
+				rst_file.content.extend(class_)
+				rst_file.content.append("\n")
 
-			rstFile.write()
+			rst_file.write()
 			modules.append(module)
 
-		packagesModules["apiModules"].extend([module for module in modules if not "tests" in module])
-		packagesModules["testsModules"].extend([module for module in modules if "tests" in module])
+		packages_modules["apiModules"].extend([module for module in modules if not "tests" in module])
+		packages_modules["testsModules"].extend([module for module in modules if "tests" in module])
 
-	apiFile = File("{0}{1}".format(output, FILES_EXTENSION))
-	apiFile.content.extend(TOCTREE_TEMPLATE_BEGIN)
-	for module in packagesModules["apiModules"]:
-		apiFile.content.append("   {0} <{1}>\n".format(module, "api/{0}".format(module)))
-	for module in packagesModules["testsModules"]:
-		apiFile.content.append("   {0} <{1}>\n".format(module, "api/{0}".format(module)))
-	apiFile.content.extend(TOCTREE_TEMPLATE_END)
-	apiFile.write()
+	api_file = File("{0}{1}".format(output, FILES_EXTENSION))
+	api_file.content.extend(TOCTREE_TEMPLATE_BEGIN)
+	for module in packages_modules["apiModules"]:
+		api_file.content.append("   {0} <{1}>\n".format(module, "api/{0}".format(module)))
+	for module in packages_modules["testsModules"]:
+		api_file.content.append("   {0} <{1}>\n".format(module, "api/{0}".format(module)))
+	api_file.content.extend(TOCTREE_TEMPLATE_END)
+	api_file.write()
 
 	return True
 
-def getCommandLineArguments():
+def get_command_line_arguments():
 	"""
 	Retrieves command line arguments.
 
@@ -270,8 +270,8 @@ def getCommandLineArguments():
 						help="'Sanitizer python module'")
 
 	parser.add_argument("-x",
-						"--excludedModules",
-						dest="excludedModules",
+						"--excluded_modules",
+						dest="excluded_modules",
 						nargs="*",
 						help="'Excluded modules.'")
 
@@ -281,7 +281,7 @@ def getCommandLineArguments():
 
 	return parser.parse_args()
 
-@foundations.decorators.systemExit
+@foundations.decorators.system_exit
 def main():
 	"""
 	Starts the Application.
@@ -290,14 +290,14 @@ def main():
 	:rtype: bool
 	"""
 
-	args = getCommandLineArguments()
-	args.sanitizer = args.sanitizer if foundations.common.pathExists(args.sanitizer) else SANITIZER
-	args.excludedModules = args.excludedModules if all(args.excludedModules) else []
-	return buildApi(args.packages,
+	args = get_command_line_arguments()
+	args.sanitizer = args.sanitizer if foundations.common.path_exists(args.sanitizer) else SANITIZER
+	args.excluded_modules = args.excluded_modules if all(args.excluded_modules) else []
+	return build_api(args.packages,
 					args.input,
 					args.output,
 					args.sanitizer,
-					args.excludedModules)
+					args.excluded_modules)
 
 if __name__ == "__main__":
 	main()
