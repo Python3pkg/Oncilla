@@ -74,6 +74,7 @@ SANITIZER = os.path.join(os.path.dirname(__file__), "default_sanitizer.py")
 foundations.verbose.get_logging_console_handler()
 foundations.verbose.set_verbosity_level(3)
 
+
 def import_sanitizer(sanitizer):
     """
     Imports the sanitizer python module.
@@ -92,7 +93,8 @@ def import_sanitizer(sanitizer):
         return namespace
     else:
         raise foundations.exceptions.ProgrammingError(
-        "{0} | '{1}' is not a valid sanitizer module file!".format(sanitizer))
+            "{0} | '{1}' is not a valid sanitizer module file!".format(sanitizer))
+
 
 def build_api(packages, input, output, sanitizer, excluded_modules=None):
     """
@@ -123,7 +125,7 @@ def build_api(packages, input, output, sanitizer, excluded_modules=None):
     excluded_modules = [] if excluded_modules is None else excluded_modules
 
     packages_modules = {"apiModules": [],
-                       "testsModules": []}
+                        "testsModules": []}
     for package in packages:
         package = __import__(package)
         path = foundations.common.get_first_item(package.__path__)
@@ -142,7 +144,7 @@ def build_api(packages, input, output, sanitizer, excluded_modules=None):
         modules = []
         for file in sorted(
                 list(foundations.walkers.files_walker(package_directory, filters_in=("{0}.*\.py$".format(path),),
-                                                     filters_out=excluded_modules))):
+                                                      filters_out=excluded_modules))):
             LOGGER.info("{0} | Python file: '{1}'".format(build_api.__name__, file))
             module = "{0}.{1}".format((".".join(os.path.dirname(file).replace(package_directory, "").split("/"))),
                                       foundations.strings.get_splitext_basename(file)).strip(".")
@@ -215,6 +217,7 @@ def build_api(packages, input, output, sanitizer, excluded_modules=None):
 
     return True
 
+
 def get_command_line_arguments():
     """
     Retrieves command line arguments.
@@ -266,6 +269,7 @@ def get_command_line_arguments():
 
     return parser.parse_args()
 
+
 @foundations.decorators.system_exit
 def main():
     """
@@ -279,10 +283,11 @@ def main():
     args.sanitizer = args.sanitizer if foundations.common.path_exists(args.sanitizer) else SANITIZER
     args.excluded_modules = args.excluded_modules if all(args.excluded_modules) else []
     return build_api(args.packages,
-                    args.input,
-                    args.output,
-                    args.sanitizer,
-                    args.excluded_modules)
+                     args.input,
+                     args.output,
+                     args.sanitizer,
+                     args.excluded_modules)
+
 
 if __name__ == "__main__":
     main()

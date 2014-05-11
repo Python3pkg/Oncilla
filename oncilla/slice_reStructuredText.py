@@ -52,10 +52,11 @@ OUTPUT_FILES_EXTENSION = "rst"
 SLICE_ATTRIBUTE_INDENT = 2
 CONTENT_DELETION = ()
 STATEMENT_SUBSTITUTE = {"resources/": "../",
-                         "     \|": "            |"}
+                        "     \|": "            |"}
 
 foundations.verbose.get_logging_console_handler()
 foundations.verbose.set_verbosity_level(3)
+
 
 def slice_reStructuredText(input, output):
     """
@@ -84,7 +85,7 @@ def slice_reStructuredText(input, output):
         slice_file = File(os.path.join(output, "{0}.{1}".format(slice, OUTPUT_FILES_EXTENSION)))
         LOGGER.info("{0} | Outputing '{1}' file!".format(slice_reStructuredText.__name__, slice_file.path))
         slice_end = index < (len(slices.values()) - 1) and slices.values()[index + 1] - SLICE_ATTRIBUTE_INDENT or \
-                   len(file.content)
+                    len(file.content)
 
         for i in range(slice_start, slice_end):
             skip_line = False
@@ -115,6 +116,7 @@ def slice_reStructuredText(input, output):
         index += 1
 
     return True
+
 
 def get_command_line_arguments():
     """
@@ -149,6 +151,7 @@ def get_command_line_arguments():
 
     return parser.parse_args()
 
+
 @foundations.decorators.system_exit
 def main():
     """
@@ -160,7 +163,8 @@ def main():
 
     args = get_command_line_arguments()
     return slice_reStructuredText(args.input,
-                                 args.output)
+                                  args.output)
+
 
 if __name__ == "__main__":
     main()

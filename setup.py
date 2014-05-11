@@ -31,6 +31,7 @@ __status__ = "Production"
 
 __all__ = ["get_long_description"]
 
+
 def get_long_description():
     """
     Returns the Package long description.
@@ -50,6 +51,7 @@ def get_long_description():
 
             description.append(line)
     return "".join(description)
+
 
 setup(name=oncilla.globals.constants.Constants.application_name,
       version=oncilla.globals.constants.Constants.version,

@@ -55,6 +55,8 @@ __all__ = ["readmodule", "readmodule_ex", "Class", "Function"]
 _modules = {}  # cache of modules we've seen
 
 # each Python class is represented by an instance of this class
+
+
 class Class:
     '''Class to represent a Python class.'''
 
@@ -71,6 +73,7 @@ class Class:
     def _addmethod(self, name, lineno):
         self.methods[name] = lineno
 
+
 class Function:
     '''Class to represent a top-level Python function'''
 
@@ -80,6 +83,7 @@ class Function:
         self.file = file
         self.lineno = lineno
 
+
 class Global:
     '''Class to represent a top-level Python global'''
 
@@ -88,6 +92,7 @@ class Global:
         self.name = name
         self.file = file
         self.lineno = lineno
+
 
 def readmodule(module, path=None):
     '''Backwards compatible interface.
@@ -101,6 +106,7 @@ def readmodule(module, path=None):
             res[key] = value
     return res
 
+
 def readmodule_ex(module, path=None):
     '''Read a module file and return a dictionary of classes.
 
@@ -109,6 +115,7 @@ def readmodule_ex(module, path=None):
     found in the module.
     '''
     return _readmodule(module, path or [])
+
 
 def _readmodule(module, path, inpackage=None):
     '''Do the hard work for readmodule[_ex].
@@ -185,7 +192,7 @@ def _readmodule(module, path, inpackage=None):
                     if isinstance(cur_class, Class):
                         # it's a method
                         cur_class._addmethod(meth_name, lineno)
-                    # else it's a nested def
+                        # else it's a nested def
                 else:
                     # it's a function
                     dict[meth_name] = Function(fullmodule, meth_name,
@@ -239,7 +246,7 @@ def _readmodule(module, path, inpackage=None):
                         # only use NAME and OP (== dot) tokens for type name
                         elif tokentype in (NAME, OP) and level == 1:
                             super.append(token)
-                        # expressions in the base list are not supported
+                            # expressions in the base list are not supported
                     inherit = names
                 cur_class = Class(fullmodule, class_name, inherit,
                                   fname, lineno)
@@ -296,6 +303,7 @@ def _readmodule(module, path, inpackage=None):
     f.close()
     return dict
 
+
 def _getnamelist(g):
     # Helper to get a comma-separated list of dotted names plus 'as'
     # clauses.	Return a list of pairs (name, name2) where name2 is
@@ -316,6 +324,7 @@ def _getnamelist(g):
             break
     return names
 
+
 def _getname(g):
     # Helper to get a dotted name, return a pair (name, token) where
     # name is the dotted name, or None if there was no dotted name,
@@ -334,6 +343,7 @@ def _getname(g):
             break
         parts.append(token)
     return (".".join(parts), token)
+
 
 def _main():
     # Main program for testing.
@@ -360,6 +370,7 @@ def _main():
                     print "	 def", name, lineno
         elif isinstance(obj, Function):
             print "def", obj.name, obj.lineno
+
 
 if __name__ == "__main__":
     _main()

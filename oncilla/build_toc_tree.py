@@ -69,6 +69,7 @@ TOCTREE_TEMPLATE_END = ["Search:\n",
 foundations.verbose.get_logging_console_handler()
 foundations.verbose.set_verbosity_level(3)
 
+
 def build_toc_tree(title, input, output, content_directory):
     """
     Builds Sphinx documentation table of content tree file.
@@ -91,7 +92,7 @@ def build_toc_tree(title, input, output, content_directory):
     file.cache()
 
     existing_files = [foundations.strings.get_splitext_basename(item)
-                     for item in glob.glob("{0}/*{1}".format(content_directory, FILES_EXTENSION))]
+                      for item in glob.glob("{0}/*{1}".format(content_directory, FILES_EXTENSION))]
     relative_directory = content_directory.replace("{0}/".format(os.path.dirname(output)), "")
 
     toc_tree = ["\n"]
@@ -121,6 +122,7 @@ def build_toc_tree(title, input, output, content_directory):
     file.write()
 
     return True
+
 
 def get_command_line_arguments():
     """
@@ -167,6 +169,7 @@ def get_command_line_arguments():
 
     return parser.parse_args()
 
+
 @foundations.decorators.system_exit
 def main():
     """
@@ -178,9 +181,10 @@ def main():
 
     args = get_command_line_arguments()
     return build_toc_tree(args.title,
-                        args.input,
-                        args.output,
-                        args.content_directory)
+                          args.input,
+                          args.output,
+                          args.content_directory)
+
 
 if __name__ == "__main__":
     main()
