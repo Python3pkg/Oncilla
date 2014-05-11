@@ -29,11 +29,11 @@ from oncilla.globals.constants import Constants
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named "sphinx.ext.*") or your custom ones.
 extensions = ["sphinx.ext.autodoc",
-			  "sphinx.ext.intersphinx",
-			  "sphinx.ext.todo",
-			  "sphinx.ext.coverage",
-			  "sphinx.ext.ifconfig",
-			  "sphinx.ext.viewcode"]
+              "sphinx.ext.intersphinx",
+              "sphinx.ext.todo",
+              "sphinx.ext.coverage",
+              "sphinx.ext.ifconfig",
+              "sphinx.ext.viewcode"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = [".templates"]
@@ -184,8 +184,8 @@ htmlhelp_basename = "OncillaDoc"
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-	("index", "Oncilla.tex", u"Oncilla Documentation",
-	 u"Thomas Mansencal", "manual"),
+    ("index", "Oncilla.tex", u"Oncilla Documentation",
+     u"Thomas Mansencal", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -216,8 +216,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-	("index", "oncilla", u"Oncilla Documentation",
-	 [u"Thomas Mansencal"], 1)
+    ("index", "oncilla", u"Oncilla Documentation",
+     [u"Thomas Mansencal"], 1)
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
