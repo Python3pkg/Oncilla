@@ -14,14 +14,8 @@
 
 """
 
-#**********************************************************************************************************************
-#***	Future imports.
-#**********************************************************************************************************************
 from __future__ import unicode_literals
 
-#**********************************************************************************************************************
-#***	External imports.
-#**********************************************************************************************************************
 import argparse
 import os
 import shutil
@@ -32,9 +26,6 @@ if sys.version_info[:2] <= (2, 6):
 else:
 	from collections import OrderedDict
 
-#**********************************************************************************************************************
-#***	Internal imports.
-#**********************************************************************************************************************
 import foundations.common
 import foundations.decorators
 import foundations.exceptions
@@ -46,9 +37,6 @@ from foundations.io import File
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "libraries"))
 import python.pyclbr as module_browser
 
-#**********************************************************************************************************************
-#***	Module attributes.
-#**********************************************************************************************************************
 __author__ = "Thomas Mansencal"
 __copyright__ = "Copyright (C) 2008 - 2014 - Thomas Mansencal"
 __license__ = "GPL V3.0 - http://www.gnu.org/licenses/"
@@ -86,9 +74,6 @@ SANITIZER = os.path.join(os.path.dirname(__file__), "default_sanitizer.py")
 foundations.verbose.get_logging_console_handler()
 foundations.verbose.set_verbosity_level(3)
 
-#**********************************************************************************************************************
-#***	Module classes and definitions.
-#**********************************************************************************************************************
 def import_sanitizer(sanitizer):
 	"""
 	Imports the sanitizer python module.
