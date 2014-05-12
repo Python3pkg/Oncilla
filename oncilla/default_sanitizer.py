@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-**sanitizer.py**
+**default_sanitizer.py**
 
 **Platform:**
     Windows, Linux, Mac Os X.
@@ -38,9 +38,7 @@ LOGGER = foundations.verbose.install_logger()
 STATEMENT_UPDATE_MESSAGE = "# Oncilla: Statement commented by auto-documentation process: "
 
 STATEMENT_SUBSTITUTE = ("(\n)(?P<bleach>\s*if\s+__name__\s+==\s+[\"']__main__[\"']\s*:.*)",
-                        "(\n)(?P<bleach>\s*@(?!property|\w+\.setter|\w+\.deleter).*?)(\n+\s*def\s+)",
-                        "(?P<bleach>sys.path.append\(os.path.join\(os.path.dirname\(os.path.abspath\(__file__\)\), \"libraries\"\)\))",
-                        "(?P<bleach>import python.pyclbr as module_browser)")
+                        "(\n)(?P<bleach>\s*@(?!property|\w+\.setter|\w+\.deleter).*?)(\n+\s*def\s+)")
 
 
 def bleach(file):
