@@ -14,7 +14,7 @@
 
 """
 
-from __future__ import unicode_literals
+
 
 import argparse
 import os
@@ -103,19 +103,19 @@ def get_command_line_arguments():
 
     parser.add_argument("-i",
                         "--input",
-                        type=unicode,
+                        type=str,
                         dest="input",
                         help="'Input reStructuredText file to convert.'")
 
     parser.add_argument("-o",
                         "--output",
-                        type=unicode,
+                        type=str,
                         dest="output",
                         help="'Output html file.'")
 
     parser.add_argument("-c",
                         "--css_file",
-                        type=unicode,
+                        type=str,
                         dest="css_file",
                         help="'Css file.'")
 

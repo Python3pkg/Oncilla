@@ -14,7 +14,7 @@
 
 """
 
-from __future__ import unicode_literals
+
 
 import argparse
 import os
@@ -81,10 +81,10 @@ def slice_reStructuredText(input, output):
             slices[search.groups()[0]] = i + SLICE_ATTRIBUTE_INDENT
 
     index = 0
-    for slice, slice_start in slices.iteritems():
+    for slice, slice_start in slices.items():
         slice_file = File(os.path.join(output, "{0}.{1}".format(slice, OUTPUT_FILES_EXTENSION)))
         LOGGER.info("{0} | Outputing '{1}' file!".format(slice_reStructuredText.__name__, slice_file.path))
-        slice_end = index < (len(slices.values()) - 1) and slices.values()[index + 1] - SLICE_ATTRIBUTE_INDENT or \
+        slice_end = index < (len(list(slices.values())) - 1) and list(slices.values())[index + 1] - SLICE_ATTRIBUTE_INDENT or \
                     len(file.content)
 
         for i in range(slice_start, slice_end):
@@ -101,7 +101,7 @@ def slice_reStructuredText(input, output):
                 continue
 
             line = file.content[i]
-            for pattern, value in STATEMENT_SUBSTITUTE.iteritems():
+            for pattern, value in STATEMENT_SUBSTITUTE.items():
                 line = re.sub(pattern, value, line)
 
             search = re.search(r"-  `[\w ]+`_ \(([\w\.]+)\)", line)
@@ -135,13 +135,13 @@ def get_command_line_arguments():
 
     parser.add_argument("-i",
                         "--input",
-                        type=unicode,
+                        type=str,
                         dest="input",
                         help="'ReStructuredText file to slice.'")
 
     parser.add_argument("-o",
                         "--output",
-                        type=unicode,
+                        type=str,
                         dest="output",
                         help="'Directory to output sliced reStructuredText files.'")
 

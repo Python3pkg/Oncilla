@@ -49,8 +49,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"Oncilla"
-copyright = u"2008 - 2014, Thomas Mansencal"
+project = "Oncilla"
+copyright = "2008 - 2014, Thomas Mansencal"
 
 # The version info for the project you"re documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -185,8 +185,8 @@ htmlhelp_basename = "OncillaDoc"
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "Oncilla.tex", u"Oncilla Documentation",
-     u"Thomas Mansencal", "manual"),
+    ("index", "Oncilla.tex", "Oncilla Documentation",
+     "Thomas Mansencal", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -217,8 +217,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ("index", "oncilla", u"Oncilla Documentation",
-     [u"Thomas Mansencal"], 1)
+    ("index", "oncilla", "Oncilla Documentation",
+     ["Thomas Mansencal"], 1)
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.

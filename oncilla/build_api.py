@@ -14,7 +14,7 @@
 
 """
 
-from __future__ import unicode_literals
+
 
 import argparse
 import os
@@ -173,7 +173,7 @@ def build_api(packages, input, output, sanitizer, excluded_modules=None):
             functions = OrderedDict()
             classes = OrderedDict()
             module_attributes = OrderedDict()
-            for member, object in module_browser._readmodule(module, [source, ]).iteritems():
+            for member, object in module_browser._readmodule(module, [source, ]).items():
                 if object.__class__ == module_browser.Function:
                     if not member.startswith("_"):
                         functions[member] = [".. autofunction:: {0}\n".format(member)]
@@ -186,17 +186,17 @@ def build_api(packages, input, output, sanitizer, excluded_modules=None):
                         module_attributes[member] = [".. attribute:: {0}.{1}\n".format(module, member)]
 
             module_attributes and rst_file.content.append("Module Attributes\n-----------------\n\n")
-            for module_attribute in module_attributes.itervalues():
+            for module_attribute in module_attributes.values():
                 rst_file.content.extend(module_attribute)
                 rst_file.content.append("\n")
 
             functions and rst_file.content.append("Functions\n---------\n\n")
-            for function in functions.itervalues():
+            for function in functions.values():
                 rst_file.content.extend(function)
                 rst_file.content.append("\n")
 
             classes and rst_file.content.append("Classes\n-------\n\n")
-            for class_ in classes.itervalues():
+            for class_ in classes.values():
                 rst_file.content.extend(class_)
                 rst_file.content.append("\n")
 
@@ -241,19 +241,19 @@ def get_command_line_arguments():
 
     parser.add_argument("-i",
                         "--input",
-                        type=unicode,
+                        type=str,
                         dest="input",
                         help="'Input modules directory.'")
 
     parser.add_argument("-o",
                         "--output",
-                        type=unicode,
+                        type=str,
                         dest="output",
                         help="'Output reStructuredText files directory.'")
 
     parser.add_argument("-s",
                         "--sanitizer",
-                        type=unicode,
+                        type=str,
                         dest="sanitizer",
                         help="'Sanitizer python module'")
 

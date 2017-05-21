@@ -14,7 +14,7 @@
 
 """
 
-from __future__ import unicode_literals
+
 
 import argparse
 import glob
@@ -141,25 +141,25 @@ def get_command_line_arguments():
 
     parser.add_argument("-t",
                         "--title",
-                        type=unicode,
+                        type=str,
                         dest="title",
                         help="'Package title.'")
 
     parser.add_argument("-i",
                         "--input",
-                        type=unicode,
+                        type=str,
                         dest="input",
                         help="'Input file to convert.'")
 
     parser.add_argument("-o",
                         "--output",
-                        type=unicode,
+                        type=str,
                         dest="output",
                         help="'Output file.'")
 
     parser.add_argument("-c",
                         "--content_directory",
-                        type=unicode,
+                        type=str,
                         dest="content_directory",
                         help="'Content directory.'")
 
